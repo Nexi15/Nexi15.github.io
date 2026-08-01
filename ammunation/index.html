@@ -141,9 +141,19 @@
     let timerInterval = null;
     let gameOver = false;
     let gameWon = false;
+    let isTransitioning = false;
+    let countdownText = "";
 
     // Klawisze
     const keys = { a: false, d: false, ArrowLeft: false, ArrowRight: false };
+
+    // Resetowanie stanu klawiszy
+    function resetKeys() {
+      keys.a = false;
+      keys.d = false;
+      keys.ArrowLeft = false;
+      keys.ArrowRight = false;
+    }
 
     // Gracza (Strzałka)
     const player = {
@@ -161,15 +171,15 @@
     const levelConfig = {
       1: {
         duration: 20,
-        speed: 3.5,
-        spawnInterval: 50, // Wyższa wartość = mniej ścian
-        wallWidth: 100
+        speed: 2.2,         // ZWOLNIONE: z 3.5 na 2.2
+        spawnInterval: 65,  // Wyższy czas spawnowania = rzadsze ściany
+        gapWidth: 95        // Szersza przerwa dla łatwiejszego manewrowania
       },
       2: {
         duration: 30,
-        speed: 5.5,
-        spawnInterval: 28, // Niższa wartość = więcej ścian
-        wallWidth: 120
+        speed: 4.8,
+        spawnInterval: 32,
+        gapWidth: 80
       }
     };
 
@@ -184,15 +194,20 @@
       if (['d', 'D', 'ArrowRight'].includes(e.key)) keys.d = false;
     });
 
+    // Wyciszenie klawiszy przy utracie ostrości okna
+    window.addEventListener('blur', resetKeys);
+
     function startLevel(lvl) {
       currentLevel = lvl;
       const config = levelConfig[lvl];
       timeLeft = config.duration;
       gameOver = false;
       gameWon = false;
+      isTransitioning = false;
       obstacles = [];
       spawnTimer = 0;
       player.x = canvas.width / 2;
+      resetKeys();
 
       document.getElementById('level-num').innerText = currentLevel;
       document.getElementById('timer').innerText = timeLeft;
@@ -200,17 +215,16 @@
       // Zegar odliczający czas
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
+        if (isTransitioning || gameOver) return;
+
         timeLeft--;
         document.getElementById('timer').innerText = timeLeft;
 
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
           if (currentLevel === 1) {
-            // Przejście do Poziomu 2
-            alert("🔥 Poziom 1 Ukończony! Przygotuj się na POZIOM 2!");
-            startLevel(2);
+            triggerTransitionToLevel2();
           } else {
-            // Wygranie całej gry
             gameWon = true;
             gameOver = true;
           }
@@ -221,14 +235,31 @@
       gameLoop();
     }
 
+    // Płynne i bezpieczne przejście do Poziomu 2 z odliczaniem
+    function triggerTransitionToLevel2() {
+      isTransitioning = true;
+      resetKeys();
+      let count = 3;
+      countdownText = `POZIOM 2 ZA ${count}...`;
+
+      const transitionInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdownText = `POZIOM 2 ZA ${count}...`;
+        } else {
+          clearInterval(transitionInterval);
+          startLevel(2);
+        }
+      }, 1000);
+    }
+
     function startGame() {
       startLevel(1);
     }
 
     function spawnObstacle() {
       const config = levelConfig[currentLevel];
-      // Generuj ścianę z przejściem w losowym miejscu
-      const gapWidth = 80; // Szerokość przerwy do przejechania
+      const gapWidth = config.gapWidth;
       const gapX = Math.random() * (canvas.width - gapWidth);
 
       // Ściana lewa
@@ -249,7 +280,7 @@
     }
 
     function update() {
-      if (gameOver) return;
+      if (gameOver || isTransitioning) return;
 
       const config = levelConfig[currentLevel];
 
@@ -273,7 +304,7 @@
         const obs = obstacles[i];
         obs.y += config.speed;
 
-        // Sprawdzanie kolizji (gracz jako trójkąt / punkty)
+        // Sprawdzanie kolizji z graczem
         if (
           player.x + player.size > obs.x &&
           player.x - player.size < obs.x + obs.width &&
@@ -292,7 +323,7 @@
     }
 
     function draw() {
-      // Czyszczenie ekranu
+      // Tło canvasa
       ctx.fillStyle = '#121517';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -304,21 +335,34 @@
         ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
       });
 
-      // Rysowanie Gracza (Grot / Strzałka w górę)
+      // Rysowanie Gracza
       ctx.fillStyle = '#ffffff';
       ctx.shadowBlur = 12;
       ctx.shadowColor = '#ffffff';
       ctx.beginPath();
-      ctx.moveTo(player.x, player.y - player.size); // Czubek
-      ctx.lineTo(player.x - player.size, player.y + player.size); // Lewy dół
-      ctx.lineTo(player.x + player.size, player.y + player.size); // Prawy dół
+      ctx.moveTo(player.x, player.y - player.size);
+      ctx.lineTo(player.x - player.size, player.y + player.size);
+      ctx.lineTo(player.x + player.size, player.y + player.size);
       ctx.closePath();
       ctx.fill();
 
-      // Reset cieni
       ctx.shadowBlur = 0;
 
-      // Nakładka Koniec Gry / Wygrana
+      // Ekran przejściowy
+      if (isTransitioning) {
+        ctx.fillStyle = 'rgba(11, 13, 14, 0.85)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ff007f';
+        ctx.font = 'bold 22px Segoe UI';
+        ctx.fillText('🔥 POZIOM 1 UKOŃCZONY!', canvas.width / 2, canvas.height / 2 - 15);
+        ctx.fillStyle = '#fff';
+        ctx.font = '18px Segoe UI';
+        ctx.fillText(countdownText, canvas.width / 2, canvas.height / 2 + 25);
+      }
+
+      // Ekran Końca Gry / Wygranej
       if (gameOver) {
         ctx.fillStyle = 'rgba(11, 13, 14, 0.85)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -330,7 +374,7 @@
           ctx.fillText('🏆 MISJA UKOŃCZONA!', canvas.width / 2, canvas.height / 2 - 10);
           ctx.fillStyle = '#fff';
           ctx.font = '14px Segoe UI';
-          ctx.fillText('Przechodzisz obie fale!', canvas.width / 2, canvas.height / 2 + 20);
+          ctx.fillText('Przetrwałeś oba poziomy!', canvas.width / 2, canvas.height / 2 + 20);
         } else {
           ctx.fillStyle = '#ff007f';
           ctx.font = 'bold 26px Segoe UI';
@@ -345,12 +389,12 @@
     function gameLoop() {
       update();
       draw();
-      if (!gameOver) {
+      if (!gameOver || isTransitioning) {
         gameLoopId = requestAnimationFrame(gameLoop);
       }
     }
 
-    // Pierwsze uruchomienie
+    // Start gry przy uruchomieniu
     startGame();
   </script>
 </body>
