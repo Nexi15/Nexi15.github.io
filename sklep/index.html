@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HACK // SKLEP</title>
+  <style>
+    :root {
+      --bg: #0b0d14;
+      --card-bg: #111420;
+      --accent: #ff0055;
+      --accent-glow: rgba(255, 0, 85, 0.4);
+      --success: #00ff66;
+      --success-glow: rgba(0, 255, 102, 0.3);
+      --key-bg: #1a1e2e;
+      --text: #ffffff;
+      --text-dim: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Karta hacka */
+    .hack-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      width: 420px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      margin-top: -12px;
+    }
+
+    /* Wprowadzony kod na górze */
+    .code-display {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .code-slot {
+      width: 48px;
+      height: 54px;
+      border-radius: 8px;
+      border: 2px solid var(--text-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-dim);
+      transition: all 0.3s ease;
+    }
+
+    .code-slot.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .code-slot.done {
+      border-color: var(--success);
+      color: var(--success);
+      box-shadow: 0 0 12px var(--success-glow);
+    }
+
+    .code-slot.dot::after {
+      content: '•';
+    }
+
+    /* Klawiatura cyfrowa */
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .key-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .key {
+      width: 100%;
+      height: 60px;
+      background: var(--key-bg);
+      border: 2px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .key.target {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 15px var(--accent-glow);
+      background: rgba(255, 0, 85, 0.05);
+    }
+
+    .key.correct {
+      border-color: var(--success);
+      color: var(--success);
+      box-shadow: 0 0 15px var(--success-glow);
+      background: rgba(0, 255, 102, 0.05);
+    }
+
+    /* Pasek timera / strefy pod przyciskiem */
+    .timing-bar {
+      width: 80%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .timing-bar.active {
+      opacity: 1;
+    }
+
+    .timing-zone {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      background: var(--success);
+      box-shadow: 0 0 6px var(--success);
+    }
+
+    .timing-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+    }
+
+    /* Statystyki pod spodem */
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .stat-val {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .instruction {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
+
+    /* Pasek globalnego czasu na samym dole */
+    .global-timer {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+
+    .global-timer-bar {
+      width: 100%;
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.1s linear;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hack-card">
+    <div class="header">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v-2h3v2zm4 0h-2v-2h2v2z"/></svg>
+      <span>Klawiatura</span>
+    </div>
+    <div class="subtitle">Przytrzymaj cyfry i puść w zielonej strefie.</div>
+
+    <!-- Puste sloty na kod -->
+    <div class="code-display" id="codeDisplay"></div>
+
+    <!-- Klawiatura 1-9 z paska naciśnięcia -->
+    <div class="keypad" id="keypad"></div>
+
+    <!-- Statystyki -->
+    <div class="stats">
+      <div class="stat-box">
+        <span class="stat-label">Runda</span>
+        <span class="stat-val" id="roundVal">1/4</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Postęp</span>
+        <span class="stat-val" id="progressVal">0/4</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Próby</span>
+        <span class="stat-val" id="attemptsVal">3/3</span>
+      </div>
+    </div>
+
+    <div class="instruction">
+      Przytrzymaj podświetloną cyfrę<br>Puść w zielonej strefie
+    </div>
+
+    <div class="global-timer">
+      <div class="global-timer-bar" id="globalBar"></div>
+    </div>
+  </div>
+
+  <script>
+    const CONFIG = {
+      totalRounds: 4,
+      codeLength: 4,
+      maxAttempts: 3,
+      roundTime: 12000, // 12 sec na rundę
+      holdSpeed: 1.2    // Prędkość zapełniania paska (ms)
+    };
+
+    let state = {
+      round: 1,
+      attempts: CONFIG.maxAttempts,
+      code: [],
+      currentIndex: 0,
+      holding: false,
+      holdProgress: 0,
+      holdInterval: null,
+      targetZone: { min: 45, max: 70 }, // Zielona strefa %
+      timeLeft: CONFIG.roundTime,
+      timerInterval: null
+    };
+
+    const codeDisplay = document.getElementById('codeDisplay');
+    const keypad = document.getElementById('keypad');
+    const roundVal = document.getElementById('roundVal');
+    const progressVal = document.getElementById('progressVal');
+    const attemptsVal = document.getElementById('attemptsVal');
+    const globalBar = document.getElementById('globalBar');
+
+    function initGame() {
+      state.round = 1;
+      state.attempts = CONFIG.maxAttempts;
+      startRound();
+    }
+
+    function startRound() {
+      state.code = Array.from({ length: CONFIG.codeLength }, () => Math.floor(Math.random() * 9) + 1);
+      state.currentIndex = 0;
+      state.timeLeft = CONFIG.roundTime;
+      
+      updateUI();
+      renderKeypad();
+      startGlobalTimer();
+    }
+
+    function renderKeypad() {
+      keypad.innerHTML = '';
+      codeDisplay.innerHTML = '';
+
+      // Renderowanie kodów na górze
+      state.code.forEach((num, idx) => {
+        const slot = document.createElement('div');
+        slot.className = 'code-slot';
+        if (idx < state.currentIndex) {
+          slot.classList.add('done');
+          slot.textContent = num;
+        } else if (idx === state.currentIndex) {
+          slot.classList.add('active');
+          slot.classList.add('dot');
+        } else {
+          slot.classList.add('dot');
+        }
+        codeDisplay.appendChild(slot);
+      });
+
+      // Renderowanie przycisków 1-9
+      for (let i = 1; i <= 9; i++) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'key-wrapper';
+
+        const btn = document.createElement('div');
+        btn.className = 'key';
+        btn.textContent = i;
+        btn.id = `key-${i}`;
+
+        if (i === state.code[state.currentIndex]) {
+          btn.classList.add('target');
+        }
+
+        // Pasek przytrzymania pod klawiszem
+        const timingBar = document.createElement('div');
+        timingBar.className = 'timing-bar';
+        timingBar.id = `bar-${i}`;
+
+        // Zielona strefa wewnątrz
+        const zone = document.createElement('div');
+        zone.className = 'timing-zone';
+        zone.style.left = `${state.targetZone.min}%`;
+        zone.style.width = `${state.targetZone.max - state.targetZone.min}%`;
+
+        const progress = document.createElement('div');
+        progress.className = 'timing-progress';
+        progress.id = `progress-${i}`;
+
+        timingBar.appendChild(zone);
+        timingBar.appendChild(progress);
+
+        wrapper.appendChild(btn);
+        wrapper.appendChild(timingBar);
+        keypad.appendChild(wrapper);
+
+        // Eventy myszy i dotyku
+        btn.addEventListener('mousedown', () => startHold(i));
+        btn.addEventListener('mouseup', () => stopHold(i));
+        btn.addEventListener('mouseleave', () => { if (state.holding) stopHold(i); });
+
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(i); });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); stopHold(i); });
+      }
+    }
+
+    function startHold(num) {
+      if (num !== state.code[state.currentIndex] || state.holding) return;
+
+      state.holding = true;
+      state.holdProgress = 0;
+      
+      const bar = document.getElementById(`bar-${num}`);
+      const progress = document.getElementById(`progress-${num}`);
+      if(bar) bar.classList.add('active');
+
+      state.holdInterval = setInterval(() => {
+        state.holdProgress += 1.5;
+        if (progress) progress.style.width = `${state.holdProgress}%`;
+
+        // Jeśli przetrzymał za długo (100%)
+        if (state.holdProgress >= 100) {
+          stopHold(num);
+        }
+      }, 15);
+    }
+
+    function stopHold(num) {
+      if (!state.holding || num !== state.code[state.currentIndex]) return;
+
+      clearInterval(state.holdInterval);
+      state.holding = false;
+
+      const bar = document.getElementById(`bar-${num}`);
+      if(bar) bar.classList.remove('active');
+
+      // Sprawdzanie czy puścił w zielonej strefie
+      if (state.holdProgress >= state.targetZone.min && state.holdProgress <= state.targetZone.max) {
+        // Sukces cyfry
+        state.currentIndex++;
+        if (state.currentIndex >= CONFIG.codeLength) {
+          // Sukces całej rundy!
+          clearInterval(state.timerInterval);
+          if (state.round >= CONFIG.totalRounds) {
+            alert("HACK UDANY! Włam zakończony sukcesem.");
+            initGame();
+          } else {
+            state.round++;
+            startRound();
+          }
+        } else {
+          // Wystaw losowo nową strefę dla kolejnej cyfry
+          state.targetZone = {
+            min: Math.floor(Math.random() * 35) + 30,
+            max: Math.floor(Math.random() * 20) + 65
+          };
+          renderKeypad();
+          updateUI();
+        }
+      } else {
+        // Błąd - nie w strefie
+        failAttempt();
+      }
+    }
+
+    function failAttempt() {
+      state.attempts--;
+      if (state.attempts <= 0) {
+        clearInterval(state.timerInterval);
+        alert("HACK NIEUDANY! Brak pozostałych prób.");
+        initGame();
+      } else {
+        startRound();
+      }
+    }
+
+    function startGlobalTimer() {
+      clearInterval(state.timerInterval);
+      state.timerInterval = setInterval(() => {
+        state.timeLeft -= 100;
+        const pct = (state.timeLeft / CONFIG.roundTime) * 100;
+        globalBar.style.width = `${pct}%`;
+
+        if (state.timeLeft <= 0) {
+          clearInterval(state.timerInterval);
+          failAttempt();
+        }
+      }, 100);
+    }
+
+    function updateUI() {
+      roundVal.textContent = `${state.round}/${CONFIG.totalRounds}`;
+      progressVal.textContent = `${state.currentIndex}/${CONFIG.codeLength}`;
+      attemptsVal.textContent = `${state.attempts}/${CONFIG.maxAttempts}`;
+    }
+
+    // Obsługa fizycznej klawiatury
+    window.addEventListener('keydown', (e) => {
+      const keyNum = parseInt(e.key);
+      if (keyNum >= 1 && keyNum <= 9) {
+        startHold(keyNum);
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      const keyNum = parseInt(e.key);
+      if (keyNum >= 1 && keyNum <= 9) {
+        stopHold(keyNum);
+      }
+    });
+
+    initGame();
+  </script>
+</body>
+</html>
