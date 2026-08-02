@@ -109,6 +109,13 @@ body {
   box-shadow: 0 0 10px #ff007f;
 }
 
+/* Red */
+.card-red .card-title { color: #ff3366; }
+.card-red .line { 
+  background-color: #ff3366; 
+  box-shadow: 0 0 10px #ff3366;
+}
+
 /* Green */
 .card-green .card-title { color: #00e640; }
 .card-green .line { 
