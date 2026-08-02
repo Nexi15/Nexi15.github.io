@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ONBEAT.GG // CYBER HUD</title>
+  <title>ONBEAT.GG // CYBER SYSTEM 3.0</title>
   <style>
     :root {
       --primary: #00f0ff;
       --primary-glow: rgba(0, 240, 255, 0.4);
-      --bg-dark: #030508;
-      --panel-bg: rgba(12, 16, 24, 0.65);
-      --border-glow: rgba(255, 255, 255, 0.08);
+      --bg-dark: #020408;
+      --panel-bg: rgba(8, 12, 20, 0.6);
+      --border: rgba(255, 255, 255, 0.08);
       --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
@@ -34,20 +34,20 @@
       position: relative;
     }
 
-    /* Dynamiczne Tło Glow */
+    /* Ambient Spotlight */
     .ambient-glow {
       position: fixed;
-      width: 600px;
-      height: 600px;
+      width: 700px;
+      height: 700px;
       background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
       top: 50%;
-      left: 30%;
+      left: 35%;
       transform: translate(-50%, -50%);
       pointer-events: none;
       z-index: 0;
-      transition: all 0.6s ease;
-      filter: blur(80px);
-      opacity: 0.6;
+      transition: background 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      filter: blur(100px);
+      opacity: 0.5;
     }
 
     #bgCanvas {
@@ -58,59 +58,82 @@
       pointer-events: none;
     }
 
-    /* Główny Dashboard */
+    /* MAIN CONTAINER */
     .dashboard {
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 1100px;
+      max-width: 1150px;
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 30px;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 35px;
       align-items: center;
     }
 
-    /* LEWY PANEL: PODGLĄD HACKA (SHOWCASE) */
+    /* SHOWCASE PANEL (LEWY) */
     .showcase-panel {
       background: var(--panel-bg);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--border-glow);
-      border-radius: 24px;
-      padding: 40px;
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      padding: 45px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 480px;
+      min-height: 520px;
       position: relative;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
-      transition: border-color 0.4s ease;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Holograficzne Tło w Panelu */
+    .holo-bg-icon {
+      position: absolute;
+      right: -40px;
+      bottom: -40px;
+      width: 320px;
+      height: 320px;
+      color: var(--primary);
+      opacity: 0.05;
+      pointer-events: none;
+      transition: all 0.6s ease;
+      transform: rotate(-10deg);
+    }
+
+    .holo-bg-icon svg {
+      width: 100%; height: 100%;
+      fill: currentColor;
     }
 
     .showcase-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      z-index: 2;
     }
 
     .sys-tag {
       font-size: 0.75rem;
       font-weight: 800;
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       color: var(--primary);
       text-transform: uppercase;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      transition: color 0.5s ease;
     }
 
     .sys-dot {
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       background-color: var(--primary);
       border-radius: 50%;
-      box-shadow: 0 0 10px var(--primary);
-      animation: pulse 1.5s infinite;
+      box-shadow: 0 0 12px var(--primary);
+      animation: pulse 1.8s infinite;
+      transition: background-color 0.5s ease, box-shadow 0.5s ease;
     }
 
     @keyframes pulse {
@@ -120,37 +143,42 @@
 
     .difficulty-badge {
       font-size: 0.7rem;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      padding: 4px 12px;
-      border-radius: 20px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      padding: 6px 16px;
+      border-radius: 30px;
       text-transform: uppercase;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--primary);
       color: var(--primary);
-      box-shadow: 0 0 10px var(--primary-glow);
+      box-shadow: 0 0 15px var(--primary-glow);
+      transition: all 0.5s ease;
     }
 
     .showcase-content {
-      margin: 30px 0;
+      margin: 40px 0;
+      z-index: 2;
     }
 
     .showcase-title {
-      font-size: 3.2rem;
+      font-size: 3.5rem;
       font-weight: 900;
       letter-spacing: 2px;
       text-transform: uppercase;
-      line-height: 1.1;
-      margin-bottom: 12px;
-      text-shadow: 0 0 20px var(--primary-glow);
-      transition: all 0.3s ease;
+      line-height: 1;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: all 0.5s ease;
     }
 
     .showcase-desc {
-      color: #8a94a6;
-      font-size: 1rem;
+      color: #94a3b8;
+      font-size: 1.05rem;
       line-height: 1.6;
-      max-width: 90%;
+      max-width: 92%;
+      font-weight: 400;
     }
 
     /* Przycisk Launchera */
@@ -158,62 +186,83 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 14px;
       width: 100%;
-      padding: 18px;
+      padding: 20px;
       background: var(--primary);
-      color: #000;
-      font-size: 1rem;
+      color: #030712;
+      font-size: 1.05rem;
       font-weight: 900;
       letter-spacing: 3px;
       text-transform: uppercase;
       text-decoration: none;
-      border-radius: 14px;
-      box-shadow: 0 10px 25px var(--primary-glow);
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border-radius: 16px;
+      box-shadow: 0 12px 30px var(--primary-glow);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 2;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .launch-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .launch-btn:hover::before {
+      left: 100%;
     }
 
     .launch-btn:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 15px 35px var(--primary-glow);
-      background: #fff;
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 20px 40px var(--primary-glow);
+      background: #ffffff;
     }
 
     .launch-btn svg {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       fill: currentColor;
+      transition: transform 0.3s ease;
     }
 
-    /* PRAWY PANEL: LISTA SELEKCJI */
+    .launch-btn:hover svg {
+      transform: translateX(6px);
+    }
+
+    /* SELECTOR PANEL (PRAWY) */
     .selector-panel {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
     .selector-title {
       font-size: 0.8rem;
       font-weight: 800;
       letter-spacing: 3px;
-      color: #5c6470;
+      color: #64748b;
       text-transform: uppercase;
-      margin-bottom: 8px;
-      padding-left: 5px;
+      margin-bottom: 6px;
+      padding-left: 6px;
     }
 
     .option-card {
       background: var(--panel-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border-glow);
-      border-radius: 16px;
-      padding: 18px 22px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 20px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       overflow: hidden;
     }
@@ -221,78 +270,81 @@
     .option-info {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 18px;
     }
 
     .option-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
       background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #8a94a6;
-      transition: all 0.3s ease;
+      color: #64748b;
+      transition: all 0.35s ease;
     }
 
     .option-icon svg {
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       fill: currentColor;
     }
 
     .option-name {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 800;
       letter-spacing: 1px;
-      color: #8a94a6;
-      transition: color 0.3s ease;
+      color: #94a3b8;
+      transition: color 0.35s ease;
     }
 
     /* Stan Aktywny / Hover */
-    .option-card:hover, .option-card.active {
+    .option-card:hover {
       background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateX(6px);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateX(8px);
+    }
+
+    .option-card.active {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: var(--opt-color);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--opt-glow);
+      transform: translateX(12px);
     }
 
     .option-card.active .option-icon {
       background: var(--opt-color);
-      color: #000;
-      box-shadow: 0 0 15px var(--opt-color);
+      color: #030712;
+      box-shadow: 0 0 20px var(--opt-color);
     }
 
     .option-card.active .option-name {
-      color: #fff;
+      color: #ffffff;
     }
 
     .active-indicator {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       background: var(--opt-color);
       opacity: 0;
-      box-shadow: 0 0 10px var(--opt-color);
-      transition: opacity 0.3s ease;
+      box-shadow: 0 0 12px var(--opt-color);
+      transition: all 0.35s ease;
+      transform: scale(0.5);
     }
 
     .option-card.active .active-indicator {
       opacity: 1;
+      transform: scale(1);
     }
 
-    /* RESPONSYWNOŚĆ */
-    @media (max-width: 900px) {
-      .dashboard {
-        grid-template-columns: 1fr;
-      }
-      .showcase-panel {
-        min-height: auto;
-        padding: 30px;
-      }
-      .showcase-title {
-        font-size: 2.2rem;
-      }
+    @media (max-width: 950px) {
+      .dashboard { grid-template-columns: 1fr; }
+      .showcase-panel { min-height: auto; padding: 35px; }
+      .showcase-title { font-size: 2.6rem; }
+      .option-card.active { transform: translateX(0) translateY(-4px); }
     }
   </style>
 </head>
@@ -303,11 +355,16 @@
 
   <div class="dashboard">
 
-    <!-- LEWY PANEL PODGLĄDU -->
+    <!-- SHOWCASE PANEL (LEWY) -->
     <div class="showcase-panel" id="showcasePanel">
+      
+      <div class="holo-bg-icon" id="holoBg">
+        <svg id="holoSvg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      </div>
+
       <div class="showcase-header">
         <div class="sys-tag">
-          <div class="sys-dot"></div> ONBEAT HUD v2.0
+          <div class="sys-dot"></div> ONBEAT HUD v3.0
         </div>
         <div class="difficulty-badge" id="diffBadge">MEDIUM</div>
       </div>
@@ -315,7 +372,7 @@
       <div class="showcase-content">
         <h1 class="showcase-title" id="showcaseTitle">LIGHTS OUT</h1>
         <p class="showcase-desc" id="showcaseDesc">
-          Trening matrycowy polegający na wygaszaniu połączeń w jak najkrótszym czasie. Wymaga logicznego myślenia i planowania ruchów.
+          Trening matrycowy polegający na wygaszaniu połączeń w jak najkrótszym czasie. Wymaga wyobraźni przestrzennej i błyskawicznego planowania.
         </p>
       </div>
 
@@ -325,18 +382,19 @@
       </a>
     </div>
 
-    <!-- PRAWY PANEL WYBORU -->
+    <!-- SELECTOR PANEL (PRAWY) -->
     <div class="selector-panel">
-      <div class="selector-title">// MODUŁY SYSTEMOWE</div>
+      <div class="selector-title">// MODUŁY TRENINGOWE</div>
 
       <!-- 1. Lights Out -->
-      <div class="option-card active" style="--opt-color: #00f0ff;" 
+      <div class="option-card active" style="--opt-color: #00f0ff; --opt-glow: rgba(0, 240, 255, 0.3);" 
            data-title="LIGHTS OUT" 
-           data-desc="Trening matrycowy polegający na wygaszaniu połączeń w jak najkrótszym czasie. Wymaga logicznego myślenia i planowania ruchów."
+           data-desc="Trening matrycowy polegający na wygaszaniu połączeń w jak najkrótszym czasie. Wymaga wyobraźni przestrzennej i błyskawicznego planowania."
            data-diff="MEDIUM"
            data-color="#00f0ff"
            data-glow="rgba(0, 240, 255, 0.4)"
-           data-href="lightsout/index.html">
+           data-href="lightsout/index.html"
+           data-svg='<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>'>
         <div class="option-info">
           <div class="option-icon">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
@@ -347,13 +405,14 @@
       </div>
 
       <!-- 2. Alarm -->
-      <div class="option-card" style="--opt-color: #ffe600;" 
+      <div class="option-card" style="--opt-color: #ffe600; --opt-glow: rgba(255, 230, 0, 0.3);" 
            data-title="ALARM" 
-           data-desc="Szybka weryfikacja pamięci wzrokowej i odtwarzanie sekwencji sygnałów ostrzegawczych w wyznaczonym reżimie czasowym."
+           data-desc="Test pamięci krótkotrwałej i odtwarzanie sekwencji sygnałów ostrzegawczych pod narzuconą presją zapisu danych."
            data-diff="EASY"
            data-color="#ffe600"
            data-glow="rgba(255, 230, 0, 0.4)"
-           data-href="alarm/index.html">
+           data-href="alarm/index.html"
+           data-svg='<path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>'>
         <div class="option-info">
           <div class="option-icon">
             <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
@@ -364,13 +423,14 @@
       </div>
 
       <!-- 3. Ammunation -->
-      <div class="option-card" style="--opt-color: #ff007f;" 
+      <div class="option-card" style="--opt-color: #ff007f; --opt-glow: rgba(255, 0, 127, 0.3);" 
            data-title="AMMUNATION" 
-           data-desc="Test natychmiastowego refleksu. Wymaga ultra-szybkiego czasu reakcji na zmienne bodźce wizualne."
+           data-desc="Maksymalny test czasu reakcji oraz koordynacji. Wymaga wyeliminowania celów w ułamkach sekund."
            data-diff="HARD"
            data-color="#ff007f"
            data-glow="rgba(255, 0, 127, 0.4)"
-           data-href="ammunation/index.html">
+           data-href="ammunation/index.html"
+           data-svg='<path d="M7 2v11h3v9l7-12h-4l4-8z"/>'>
         <div class="option-info">
           <div class="option-icon">
             <svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
@@ -381,13 +441,14 @@
       </div>
 
       <!-- 4. Jacht -->
-      <a class="option-card" style="--opt-color: #ff3355;" 
+      <div class="option-card" style="--opt-color: #ff3355; --opt-glow: rgba(255, 51, 85, 0.3);" 
            data-title="JACHT" 
-           data-desc="Zaawansowany algorytm złamania zabezpieczeń jednostek morskich. Wymaga precyzji i zimnej krwi."
+           data-desc="Przełamywanie szyfrów morskich systemów nawigacji. Złożony ciąg sekwencyjny dla zaawansowanych."
            data-diff="HARD"
            data-color="#ff3355"
            data-glow="rgba(255, 51, 85, 0.4)"
-           data-href="jacht/index.html">
+           data-href="jacht/index.html"
+           data-svg='<path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68c.08-.26.06-.54-.06-.78s-.34-.42-.6-.5L12 6.08 2.72 9.04c-.26.08-.47.26-.6.5s-.14.52-.06.78L3.95 19z"/>'>
         <div class="option-info">
           <div class="option-icon">
             <svg viewBox="0 0 24 24"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68c.08-.26.06-.54-.06-.78s-.34-.42-.6-.5L12 6.08 2.72 9.04c-.26.08-.47.26-.6.5s-.14.52-.06.78L3.95 19z"/></svg>
@@ -395,16 +456,17 @@
           <div class="option-name">JACHT</div>
         </div>
         <div class="active-indicator"></div>
-      </a>
+      </div>
 
       <!-- 5. Fleeca -->
-      <div class="option-card" style="--opt-color: #00ff66;" 
+      <div class="option-card" style="--opt-color: #00ff66; --opt-glow: rgba(0, 255, 102, 0.3);" 
            data-title="FLEECA" 
-           data-desc="Symulacja hackingowa systemu bankowego Fleeca. Trening wieloetapowy pod presją upływającego czasu."
+           data-desc="Symulacja przełamywania zabezpieczeń skarbca banku Fleeca. Połączenie precyzji i zimnej krwi."
            data-diff="MEDIUM"
            data-color="#00ff66"
            data-glow="rgba(0, 255, 102, 0.4)"
-           data-href="fleeca/index.html">
+           data-href="fleeca/index.html"
+           data-svg='<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3 3.1-3 1.71 0 3.1 1.29 3.1 3v2z"/>'>
         <div class="option-info">
           <div class="option-icon">
             <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3 3.1-3 1.71 0 3.1 1.29 3.1 3v2z"/></svg>
@@ -419,23 +481,25 @@
   </div>
 
   <script>
-    // INTERAKCJA PRZEŁĄCZANIA MODUŁÓW
+    // PRZEŁĄCZANIE ORAZ ANIMACJE HUD
     const options = document.querySelectorAll('.option-card');
     const showcaseTitle = document.getElementById('showcaseTitle');
     const showcaseDesc = document.getElementById('showcaseDesc');
     const diffBadge = document.getElementById('diffBadge');
     const launchBtn = document.getElementById('launchBtn');
-    const ambientGlow = document.getElementById('ambientGlow');
+    const holoSvg = document.getElementById('hologramSvg') || document.querySelector('#holoBg svg');
     const root = document.documentElement;
 
     options.forEach(option => {
-      option.addEventListener('mouseenter', () => selectOption(option));
+      option.addEventListener('mouseenter', () => activateModule(option));
       option.addEventListener('click', () => {
         window.location.href = option.dataset.href;
       });
     });
 
-    function selectOption(elem) {
+    function activateModule(elem) {
+      if(elem.classList.contains('active')) return;
+
       options.forEach(o => o.classList.remove('active'));
       elem.classList.add('active');
 
@@ -445,20 +509,37 @@
       const color = elem.dataset.color;
       const glow = elem.dataset.glow;
       const href = elem.dataset.href;
+      const svgContent = elem.dataset.svg;
 
-      showcaseTitle.textContent = title;
-      showcaseDesc.textContent = desc;
-      diffBadge.textContent = diff;
-      launchBtn.href = href;
+      // Efekt Micro-Fadingu
+      showcaseTitle.style.opacity = '0';
+      showcaseDesc.style.opacity = '0';
 
-      // Zmiana Zmiennych CSS dla Animacji Kolorów
+      setTimeout(() => {
+        showcaseTitle.textContent = title;
+        showcaseDesc.textContent = desc;
+        diffBadge.textContent = diff;
+        launchBtn.href = href;
+        holoSvg.innerHTML = svgContent;
+
+        showcaseTitle.style.opacity = '1';
+        showcaseDesc.style.opacity = '1';
+      }, 150);
+
       root.style.setProperty('--primary', color);
       root.style.setProperty('--primary-glow', glow);
     }
 
-    // TŁO - CANVAS
+    // INTERAKTYWNE TŁO CANVAS Z LASERAMI I MYSZKĄ
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
+
+    let mouse = { x: null, y: null };
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
 
     function resize() {
       canvas.width = window.innerWidth;
@@ -467,15 +548,67 @@
     window.addEventListener('resize', resize);
     resize();
 
-    function drawBg() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.015)';
-      for (let i = 0; i < canvas.width; i += 30) {
-        ctx.fillRect(i, 0, 1, canvas.height);
+    class Particle {
+      constructor() {
+        this.reset();
       }
-      requestAnimationFrame(drawBg);
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 1.5 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.4;
+        this.speedY = (Math.random() - 0.5) * 0.4;
+        this.alpha = Math.random() * 0.5 + 0.1;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (mouse.x && mouse.y) {
+          let dx = mouse.x - this.x;
+          let dy = mouse.y - this.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            this.x -= dx * 0.015;
+            this.y -= dy * 0.015;
+          }
+        }
+
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+      }
+      draw() {
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
-    drawBg();
+
+    const particles = Array.from({ length: 60 }, () => new Particle());
+
+    function renderBg() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Siatka cyfrowa
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += 40) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(renderBg);
+    }
+    renderBg();
   </script>
 
 </body>
