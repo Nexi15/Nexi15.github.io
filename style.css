@@ -15,11 +15,11 @@ body {
   min-height: 100vh;
 }
 
-/* Układ siatki (4 kolumny) */
+/* Układ siatki (Automatyczne dopasowanie kolumn do liczby kart) */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  height: 100vh;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  min-height: 100vh;
   width: 100%;
 }
 
@@ -33,6 +33,7 @@ body {
   position: relative;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   transition: background-color 0.3s ease;
+  min-height: 300px;
 }
 
 .card:last-child {
@@ -78,6 +79,7 @@ body {
   font-weight: 700;
   letter-spacing: 1.5px;
   cursor: pointer;
+  text-decoration: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
@@ -109,14 +111,14 @@ body {
   box-shadow: 0 0 10px #ff007f;
 }
 
-/* Red */
+/* Red (Nowy dla Jachtu) */
 .card-red .card-title { color: #ff3366; }
 .card-red .line { 
   background-color: #ff3366; 
   box-shadow: 0 0 10px #ff3366;
 }
 
-/* Green */
+/* Green (Fleeca) */
 .card-green .card-title { color: #00e640; }
 .card-green .line { 
   background-color: #00e640; 
