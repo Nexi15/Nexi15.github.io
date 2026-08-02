@@ -109,7 +109,7 @@ body {
 /* ========================================================= */
 
 /* 1. Cyan (Lights Out) */
-.card-cyan .card-title { color: #ffffff; }
+.card-cyan .card-title { color: #00bcd4; }
 .card-cyan .line { 
   background-color: #00bcd4;
   box-shadow: 0 0 10px #00bcd4;
@@ -132,7 +132,7 @@ body {
 }
 
 /* 2. Yellow (Alarm) */
-.card-yellow .card-title { color: #ffffff; }
+.card-yellow .card-title { color: #d4cf00; }
 .card-yellow .line { 
   background-color: #d4cf00; 
   box-shadow: 0 0 10px #d4cf00;
