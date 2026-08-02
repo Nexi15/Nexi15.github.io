@@ -91,14 +91,14 @@ body {
 /* --- WARIANTY KOLORYSTYCZNE --- */
 
 /* Cyan */
-.card-cyan .card-title { color: #ffffff; }
+.card-cyan .card-title { color: #00bcd4; }
 .card-cyan .line { 
   background-color: #00bcd4;
   box-shadow: 0 0 10px #00bcd4;
 }
 
 /* Yellow */
-.card-yellow .card-title { color: #ffffff; }
+.card-yellow .card-title { color: #d4cf00; }
 .card-yellow .line { 
   background-color: #d4cf00; 
   box-shadow: 0 0 10px #d4cf00;
