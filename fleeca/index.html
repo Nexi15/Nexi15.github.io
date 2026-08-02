@@ -71,18 +71,30 @@
       cursor: grabbing;
     }
 
-    .difficulty-selector {
+    /* Panel wyboru trudności i suwak */
+    .settings-panel {
       margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      background: #0b1e13;
+      padding: 12px 20px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .difficulty-selector {
       display: flex;
       gap: 10px;
       align-items: center;
     }
 
     .diff-btn {
-      background: #0b1e13;
+      background: #0d2818;
       border: 1px solid #00ff88;
       color: #00ff88;
-      padding: 6px 12px;
+      padding: 6px 14px;
       font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
@@ -94,6 +106,21 @@
       background: #00ff88;
       color: #050d08;
       box-shadow: 0 0 10px #00ff88;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: #00ff88;
+      font-weight: 600;
+    }
+
+    input[type=range] {
+      accent-color: #00ff88;
+      cursor: pointer;
+      width: 150px;
     }
 
     .instructions {
@@ -143,7 +170,7 @@
 <body>
 
   <div class="header">
-    <h1>UNTANGLE [FLECCA]</h1>
+    <h1>UNTANGLE [FLEECA]</h1>
   </div>
 
   <div class="info-bar">
@@ -151,13 +178,21 @@
     <div>Czas: <span id="timer">60.0</span>s</div>
   </div>
 
-  <canvas id="gameCanvas" width="460" height="380"></canvas>
+  <canvas id="gameCanvas" width="480" height="380"></canvas>
 
-  <div class="difficulty-selector">
-    <span style="font-size: 0.85rem; color: #888;">Poziom:</span>
-    <button class="diff-btn active" onclick="setDifficulty(6, this)">ŁATWY</button>
-    <button class="diff-btn" onclick="setDifficulty(8, this)">ŚREDNI</button>
-    <button class="diff-btn" onclick="setDifficulty(10, this)">TRUDNY</button>
+  <div class="settings-panel">
+    <div class="difficulty-selector">
+      <span style="font-size: 0.85rem; color: #888;">Poziom:</span>
+      <button class="diff-btn active" id="btn-easy" onclick="setPreset(5, 'btn-easy')">EASY (5)</button>
+      <button class="diff-btn" id="btn-med" onclick="setPreset(8, 'btn-med')">MED (8)</button>
+      <button class="diff-btn" id="btn-hard" onclick="setPreset(12, 'btn-hard')">HARD (12)</button>
+    </div>
+
+    <div class="slider-container">
+      <label for="nodeSlider">Liczba kropek:</label>
+      <input type="range" id="nodeSlider" min="4" max="16" value="5" oninput="onSliderChange(this.value)">
+      <span id="sliderValue">5</span>
+    </div>
   </div>
 
   <div class="instructions">
@@ -173,8 +208,8 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    let nodeCount = 6;
-    const NODE_RADIUS = 11;
+    let nodeCount = 5;
+    const NODE_RADIUS = 10;
 
     let nodes = [];
     let edges = [];
@@ -184,10 +219,28 @@
     let gameOver = false;
     let gameWon = false;
 
-    function setDifficulty(count, btn) {
+    // Przycisk ustawiający poziom
+    function setPreset(count, btnId) {
       nodeCount = count;
+      document.getElementById('nodeSlider').value = count;
+      document.getElementById('sliderValue').innerText = count;
+
       document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      document.getElementById(btnId).classList.add('active');
+
+      initGame();
+    }
+
+    // Zmiana za pomocą suwaka (4 - 16)
+    function onSliderChange(val) {
+      nodeCount = parseInt(val);
+      document.getElementById('sliderValue').innerText = nodeCount;
+
+      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+      if (nodeCount === 5) document.getElementById('btn-easy').classList.add('active');
+      else if (nodeCount === 8) document.getElementById('btn-med').classList.add('active');
+      else if (nodeCount === 12) document.getElementById('btn-hard').classList.add('active');
+
       initGame();
     }
 
@@ -212,6 +265,7 @@
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
 
+      // Generuj położenia w kółku (rozwiązanie zawsze istnieje!)
       for (let i = 0; i < nodeCount; i++) {
         const angle = (i / nodeCount) * Math.PI * 2;
         nodes.push({
@@ -220,14 +274,20 @@
         });
       }
 
+      // Połącz obwód
       for (let i = 0; i < nodeCount; i++) {
         edges.push([i, (i + 1) % nodeCount]);
       }
 
-      if (nodeCount >= 8) edges.push([0, 3], [2, 5]);
-      if (nodeCount >= 10) edges.push([1, 6], [4, 8]);
+      // Dodatkowe nietypowe połączenia zależnie od ilości
+      if (nodeCount >= 6) edges.push([0, 2], [3, 5]);
+      if (nodeCount >= 8) edges.push([1, 4], [5, 7]);
+      if (nodeCount >= 10) edges.push([2, 6], [7, 9]);
+      if (nodeCount >= 12) edges.push([0, 5], [6, 11]);
+      if (nodeCount >= 14) edges.push([3, 8], [9, 13]);
+      if (nodeCount >= 16) edges.push([1, 9], [4, 12]);
 
-      // Pomieszanie punktów
+      // Losowo pomieszaj kropki na planszy
       nodes.forEach(node => {
         node.x = Math.floor(40 + Math.random() * (canvas.width - 80));
         node.y = Math.floor(40 + Math.random() * (canvas.height - 80));
@@ -358,11 +418,11 @@
         ctx.fillStyle = '#ffffff';
         ctx.shadowBlur = 0;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, 3.5, 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, 3, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Sprawdzenie wygranej
+      // Wygrana
       if (currentCrossings === 0 && !gameOver) {
         gameWon = true;
         gameOver = true;
@@ -378,17 +438,17 @@
         if (gameWon) {
           ctx.fillStyle = '#00ff88';
           ctx.font = 'bold 24px Segoe UI';
-          ctx.fillText('🔓 FLECCA ROZPRACOWANA!', canvas.width / 2, canvas.height / 2 - 10);
+          ctx.fillText('🔓 FLEECA ROZPRACOWANA!', canvas.width / 2, canvas.height / 2 - 10);
           ctx.fillStyle = '#fff';
           ctx.font = '14px Segoe UI';
-          ctx.fillText('System został pomyślnie zresetowany!', canvas.width / 2, canvas.height / 2 + 20);
+          ctx.fillText('Sieć pomyślnie rozplątana!', canvas.width / 2, canvas.height / 2 + 20);
         } else {
           ctx.fillStyle = '#ff3366';
           ctx.font = 'bold 24px Segoe UI';
           ctx.fillText('💥 ALARM BANKOWY!', canvas.width / 2, canvas.height / 2 - 10);
           ctx.fillStyle = '#fff';
           ctx.font = '14px Segoe UI';
-          ctx.fillText('Czas minął! Nie rozplątano sieci.', canvas.width / 2, canvas.height / 2 + 20);
+          ctx.fillText('Czas minął! System zablokowany.', canvas.width / 2, canvas.height / 2 + 20);
         }
       }
     }
