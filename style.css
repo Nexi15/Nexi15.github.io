@@ -112,17 +112,17 @@ body {
 }
 
 /* Red (Nowy dla Jachtu) */
-.card-red .card-title { color: #ff3366; }
+.card-red .card-title { color: #e81c0e; }
 .card-red .line { 
-  background-color: #ff3366; 
-  box-shadow: 0 0 10px #ff3366;
+  background-color: #e81c0e; 
+  box-shadow: 0 0 10px #e81c0e;
 }
 
 /* Green (Fleeca) */
-.card-green .card-title { color: #00e640; }
+.card-green .card-title { color: #456123; }
 .card-green .line { 
-  background-color: #00e640; 
-  box-shadow: 0 0 10px #00e640;
+  background-color: #456123; 
+  box-shadow: 0 0 10px #456123;
 }
 
 /* Responsywność dla urządzeń mobilnych */
