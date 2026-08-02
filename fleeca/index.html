@@ -195,7 +195,7 @@
   </div>
 
   <div class="instructions">
-    Ułóż kropki tak, aby rozplątać sieć wokół głównego węzła!
+    Ułóż kropki tak, aby rozplątać sieć bez przecinających się linii!
   </div>
 
   <div class="controls">
@@ -254,23 +254,21 @@
       return (ccw(a, c, d) !== ccw(b, c, d)) && (ccw(a, b, c) !== ccw(a, b, d));
     }
 
-    // Generator: 1 kropka główna + pierścień z 3 połączeniami na kropkę
+    // Generator sieci: 1 kropka połączona ze wszystkimi + pierścień
     function generateStarWebGraph() {
       nodes = [];
       edges = [];
 
-      // Tworzymy punkty
       for (let i = 0; i < nodeCount; i++) {
-        nodes.push({ x: 0, y: 0, isCenter: (i === 0) });
+        nodes.push({ x: 0, y: 0 });
       }
 
-      // Kropka index 0 to kropka główna.
-      // 1. Łączymy kropkę główną (0) ze WSZYSTKIMI pozostałymi (1 do nodeCount-1)
+      // Kropka index 0 połączona ze wszystkimi pozostałymi
       for (let i = 1; i < nodeCount; i++) {
         edges.push([0, i]);
       }
 
-      // 2. Pozostałe kropki łączymy w koło (każda dostaje +2 połączenia, więc ma łącznie 3)
+      // Pozostałe kropki tworzą pierścień (dzięki temu mają po 3 połączenia)
       const outerCount = nodeCount - 1;
       for (let i = 0; i < outerCount; i++) {
         let current = 1 + i;
@@ -278,7 +276,7 @@
         edges.push([current, next]);
       }
 
-      // Rozrzucamy kropki losowo po planszy
+      // Losowe rozrzucenie kropek po planszy
       nodes.forEach(node => {
         node.x = Math.floor(50 + Math.random() * (canvas.width - 100));
         node.y = Math.floor(50 + Math.random() * (canvas.height - 100));
@@ -397,25 +395,20 @@
         ctx.stroke();
       });
 
-      // Rysowanie punktów
-      nodes.forEach((node, index) => {
-        const isCenter = (index === 0);
-        
-        // Główny punkt wyróżniamy rozmiarem i kolorem (złoty/jasnozielony)
-        const radius = isCenter ? NODE_RADIUS + 3 : NODE_RADIUS;
-        
-        ctx.fillStyle = isCenter ? '#ffd700' : '#00ff88';
-        ctx.shadowBlur = isCenter ? 15 : 10;
-        ctx.shadowColor = isCenter ? '#ffd700' : '#00ff88';
+      // Rysowanie punktów (wszystkie identyczne)
+      nodes.forEach(node => {
+        ctx.fillStyle = '#00ff88';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#00ff88';
         
         ctx.beginPath();
-        ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, NODE_RADIUS, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = '#ffffff';
         ctx.shadowBlur = 0;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, isCenter ? 4 : 3, 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, 3, 0, Math.PI * 2);
         ctx.fill();
       });
 
