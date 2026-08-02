@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fleeca - Untangle Network</title>
+  <title>Fleeca Bank - Mini Games</title>
   <style>
     * {
       box-sizing: border-box;
@@ -26,20 +26,52 @@
       user-select: none;
     }
 
-    .header {
-      text-align: center;
-      margin-bottom: 10px;
+    /* Pasek Wyboru Poziomu */
+    .level-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
     }
 
-    h1 {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: #00ff88;
-      text-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
-      letter-spacing: 1px;
+    .tab-btn {
+      background: rgba(0, 255, 136, 0.05);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      color: #888;
+      padding: 10px 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.5px;
     }
 
-    .info-bar {
+    .tab-btn:hover {
+      border-color: #00ff88;
+      color: #fff;
+    }
+
+    .tab-btn.active {
+      background: #00ff88;
+      color: #050d08;
+      border-color: #00ff88;
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+    }
+
+    /* Kontenery Poziomów */
+    .level-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .level-container.active {
+      display: flex;
+    }
+
+    /* --- STYLE DLA POZIOMU 1 (SIEĆ) --- */
+    .info-bar-1 {
       display: flex;
       gap: 30px;
       font-size: 1.1rem;
@@ -51,13 +83,8 @@
       border: 1px solid rgba(0, 255, 136, 0.3);
     }
 
-    .crossings-count {
-      color: #ff3366;
-    }
-
-    .crossings-count.zero {
-      color: #00ff88;
-    }
+    .crossings-count { color: #ff3366; }
+    .crossings-count.zero { color: #00ff88; }
 
     #gameCanvas {
       background: #07140c;
@@ -67,9 +94,7 @@
       cursor: grab;
     }
 
-    #gameCanvas:active {
-      cursor: grabbing;
-    }
+    #gameCanvas:active { cursor: grabbing; }
 
     .settings-panel {
       margin-top: 15px;
@@ -122,16 +147,108 @@
       width: 150px;
     }
 
-    .instructions {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color: #6a997a;
+    /* --- STYLE DLA POZIOMU 2 (MINY) --- */
+    .game-card-2 {
+      background-color: #0f0e17;
+      border: 1px solid rgba(255, 0, 127, 0.2);
+      border-radius: 12px;
+      padding: 25px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 0, 127, 0.1);
+      position: relative;
     }
 
+    .card-header-2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      color: #ff007f;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .progress-bar-bg {
+      background: rgba(255, 255, 255, 0.1);
+      height: 6px;
+      border-radius: 3px;
+      width: 100%;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+
+    .progress-bar-fill {
+      background: #ff007f;
+      height: 100%;
+      width: 100%;
+      box-shadow: 0 0 10px #ff007f;
+      transition: width 0.1s linear;
+    }
+
+    .status-bar-2 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #a0a0b0;
+      margin-bottom: 15px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      background: #0b0a12;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .cell-2 {
+      aspect-ratio: 1;
+      background: #151421;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .cell-2:hover {
+      border-color: rgba(255, 0, 127, 0.4);
+      background: #1c1a2b;
+    }
+
+    .cell-2.has-mine {
+      border-color: #ff007f;
+      background: rgba(255, 0, 127, 0.15);
+      box-shadow: inset 0 0 8px rgba(255, 0, 127, 0.3);
+    }
+
+    .cell-2.has-mine::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #ff007f;
+      border-radius: 1px;
+      box-shadow: 0 0 8px #ff007f;
+    }
+
+    .cell-2.wrong {
+      background: rgba(255, 51, 102, 0.4);
+      border-color: #ff3366;
+    }
+
+    /* Wspólne przyciski */
     .controls {
       margin-top: 15px;
       display: flex;
       gap: 15px;
+      justify-content: center;
     }
 
     .btn {
@@ -154,6 +271,17 @@
       box-shadow: 0 0 15px #00ff88;
     }
 
+    .btn-pink {
+      background: #181625;
+      border-color: #ff007f;
+    }
+
+    .btn-pink:hover {
+      background: #ff007f;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+    }
+
     .back-btn {
       border-color: rgba(255, 255, 255, 0.2);
       background: rgba(255, 255, 255, 0.05);
@@ -162,288 +290,341 @@
     .back-btn:hover {
       background: #fff;
       color: #000;
-      box-shadow: 0 0 10px #fff;
+    }
+
+    .result-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 14, 23, 0.95);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>UNTANGLE [FLEECA]</h1>
+  <!-- Pasek Wyboru Poziomu -->
+  <div class="level-tabs">
+    <button class="tab-btn active" id="tab-lvl1" onclick="switchLevel(1)">POZIOM 1: ROZPLĄTYWANIE</button>
+    <button class="tab-btn" id="tab-lvl2" onclick="switchLevel(2)">POZIOM 2: ZAPAMIĘTYWANIE MIN</button>
   </div>
 
-  <div class="info-bar">
-    <div>Przecięcia: <span id="crossings" class="crossings-count">0</span></div>
-    <div>Czas: <span id="timer">60.0</span>s</div>
-  </div>
-
-  <canvas id="gameCanvas" width="480" height="380"></canvas>
-
-  <div class="settings-panel">
-    <div class="difficulty-selector">
-      <span style="font-size: 0.85rem; color: #888;">Poziom:</span>
-      <button class="diff-btn active" id="btn-easy" onclick="setPreset(5, 'btn-easy')">EASY (5)</button>
-      <button class="diff-btn" id="btn-med" onclick="setPreset(8, 'btn-med')">MED (8)</button>
-      <button class="diff-btn" id="btn-hard" onclick="setPreset(12, 'btn-hard')">HARD (12)</button>
+  <!-- ================= POZIOM 1: UNTANGLE (SIEĆ) ================= -->
+  <div id="level1" class="level-container active">
+    <div class="info-bar-1">
+      <div>Przecięcia: <span id="crossings" class="crossings-count">0</span></div>
+      <div>Czas: <span id="timer1">60.0</span>s</div>
     </div>
 
-    <div class="slider-container">
-      <label for="nodeSlider">Liczba kropek:</label>
-      <input type="range" id="nodeSlider" min="4" max="16" value="5" oninput="onSliderChange(this.value)">
-      <span id="sliderValue">5</span>
+    <canvas id="gameCanvas" width="480" height="360"></canvas>
+
+    <div class="settings-panel">
+      <div class="difficulty-selector">
+        <span style="font-size: 0.85rem; color: #888;">Poziom:</span>
+        <button class="diff-btn active" id="btn-easy" onclick="setPreset1(5, 'btn-easy')">EASY (5)</button>
+        <button class="diff-btn" id="btn-med" onclick="setPreset1(8, 'btn-med')">MED (8)</button>
+        <button class="diff-btn" id="btn-hard" onclick="setPreset1(12, 'btn-hard')">HARD (12)</button>
+      </div>
+
+      <div class="slider-container">
+        <label for="nodeSlider">Liczba kropek:</label>
+        <input type="range" id="nodeSlider" min="4" max="16" value="5" oninput="onSliderChange1(this.value)">
+        <span id="sliderValue">5</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" onclick="initLevel1()">RESET / START</button>
+      <a href="../index.html" class="btn back-btn">⬅ MENU GłÓWNE</a>
     </div>
   </div>
 
-  <div class="instructions">
-    Ułóż kropki tak, aby rozplątać sieć bez przecinających się linii!
-  </div>
+  <!-- ================= POZIOM 2: MINY (PAMIĘĆ) ================= -->
+  <div id="level2" class="level-container">
+    <div class="game-card-2">
+      <div class="card-header-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#ff007f">
+          <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+        </svg>
+        Miny
+      </div>
 
-  <div class="controls">
-    <button class="btn" onclick="initGame()">RESET / START</button>
-    <a href="../index.html" class="btn back-btn">⬅ Powrót do menu</a>
+      <div class="progress-bar-bg">
+        <div id="progressFill2" class="progress-bar-fill"></div>
+      </div>
+
+      <div class="status-bar-2">
+        <span id="statusText2" style="color: #ff007f;">ZAPAMIĘTAJ MINY</span>
+        <div>
+          <span id="minesCounter2">0/8</span> | <span id="stageCounter2">0/2</span>
+        </div>
+      </div>
+
+      <div class="grid-2" id="grid2"></div>
+
+      <div class="controls">
+        <button class="btn btn-pink" onclick="initLevel2()">RESET / START</button>
+        <a href="../index.html" class="btn back-btn">MENU GŁÓWNE</a>
+      </div>
+
+      <div id="resultOverlay2" class="result-overlay" style="display: none;">
+        <div id="resultTitle2" style="font-size: 1.5rem; font-weight: 800;"></div>
+        <div id="resultSub2" style="color: #aaa; font-size: 0.9rem;"></div>
+        <button class="btn btn-pink" onclick="initLevel2()" style="margin-top: 10px;">ZAGRAJ PONOWNIE</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+    // System przełączania poziomów
+    function switchLevel(lvl) {
+      document.getElementById('level1').classList.remove('active');
+      document.getElementById('level2').classList.remove('active');
+      document.getElementById('tab-lvl1').classList.remove('active');
+      document.getElementById('tab-lvl2').classList.remove('active');
 
-    let nodeCount = 5;
-    const NODE_RADIUS = 10;
+      clearInterval(timerInterval1);
+      clearInterval(timerInterval2);
 
-    let nodes = [];
-    let edges = [];
-    let draggedNode = null;
-    let timeLeft = 60.0;
-    let timerInterval = null;
-    let gameOver = false;
-    let gameWon = false;
-
-    function setPreset(count, btnId) {
-      nodeCount = count;
-      document.getElementById('nodeSlider').value = count;
-      document.getElementById('sliderValue').innerText = count;
-
-      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(btnId).classList.add('active');
-
-      initGame();
+      if (lvl === 1) {
+        document.getElementById('level1').classList.add('active');
+        document.getElementById('tab-lvl1').classList.add('active');
+        initLevel1();
+      } else {
+        document.getElementById('level2').classList.add('active');
+        document.getElementById('tab-lvl2').classList.add('active');
+        initLevel2();
+      }
     }
 
-    function onSliderChange(val) {
-      nodeCount = parseInt(val);
-      document.getElementById('sliderValue').innerText = nodeCount;
+    /* ========================================================= */
+    /* --- LOGIKA POZIOMU 1: UNTANGLE (ROZPLĄTYWANIE SIEĆ) --- */
+    /* ========================================================= */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let nodeCount1 = 5;
+    const NODE_RADIUS = 10;
+    let nodes1 = [], edges1 = [], draggedNode1 = null;
+    let timeLeft1 = 60.0, timerInterval1 = null, gameOver1 = false, gameWon1 = false;
 
+    function setPreset1(count, btnId) {
+      nodeCount1 = count;
+      document.getElementById('nodeSlider').value = count;
+      document.getElementById('sliderValue').innerText = count;
       document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-      if (nodeCount === 5) document.getElementById('btn-easy').classList.add('active');
-      else if (nodeCount === 8) document.getElementById('btn-med').classList.add('active');
-      else if (nodeCount === 12) document.getElementById('btn-hard').classList.add('active');
+      document.getElementById(btnId).classList.add('active');
+      initLevel1();
+    }
 
-      initGame();
+    function onSliderChange1(val) {
+      nodeCount1 = parseInt(val);
+      document.getElementById('sliderValue').innerText = nodeCount1;
+      initLevel1();
     }
 
     function intersects(a, b, c, d) {
       if ((a.x === c.x && a.y === c.y) || (a.x === d.x && a.y === d.y) ||
-          (b.x === c.x && b.y === c.y) || (b.x === d.x && b.y === d.y)) {
-        return false;
-      }
-
-      function ccw(p1, p2, p3) {
-        return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
-      }
-
+          (b.x === c.x && b.y === c.y) || (b.x === d.x && b.y === d.y)) return false;
+      function ccw(p1, p2, p3) { return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x); }
       return (ccw(a, c, d) !== ccw(b, c, d)) && (ccw(a, b, c) !== ccw(a, b, d));
     }
 
-    // Generator sieci: 1 kropka połączona ze wszystkimi + pierścień
     function generateStarWebGraph() {
-      nodes = [];
-      edges = [];
-
-      for (let i = 0; i < nodeCount; i++) {
-        nodes.push({ x: 0, y: 0 });
-      }
-
-      // Kropka index 0 połączona ze wszystkimi pozostałymi
-      for (let i = 1; i < nodeCount; i++) {
-        edges.push([0, i]);
-      }
-
-      // Pozostałe kropki tworzą pierścień (dzięki temu mają po 3 połączenia)
-      const outerCount = nodeCount - 1;
+      nodes1 = []; edges1 = [];
+      for (let i = 0; i < nodeCount1; i++) nodes1.push({ x: 0, y: 0 });
+      for (let i = 1; i < nodeCount1; i++) edges1.push([0, i]);
+      const outerCount = nodeCount1 - 1;
       for (let i = 0; i < outerCount; i++) {
-        let current = 1 + i;
-        let next = 1 + ((i + 1) % outerCount);
-        edges.push([current, next]);
+        edges1.push([1 + i, 1 + ((i + 1) % outerCount)]);
       }
-
-      // Losowe rozrzucenie kropek po planszy
-      nodes.forEach(node => {
-        node.x = Math.floor(50 + Math.random() * (canvas.width - 100));
-        node.y = Math.floor(50 + Math.random() * (canvas.height - 100));
+      nodes1.forEach(n => {
+        n.x = Math.floor(50 + Math.random() * (canvas.width - 100));
+        n.y = Math.floor(50 + Math.random() * (canvas.height - 100));
       });
     }
 
-    function countCrossings() {
+    function countCrossings1() {
       let count = 0;
-      for (let i = 0; i < edges.length; i++) {
-        for (let j = i + 1; j < edges.length; j++) {
-          const e1 = edges[i];
-          const e2 = edges[j];
-          if (intersects(nodes[e1[0]], nodes[e1[1]], nodes[e2[0]], nodes[e2[1]])) {
-            count++;
-          }
+      for (let i = 0; i < edges1.length; i++) {
+        for (let j = i + 1; j < edges1.length; j++) {
+          if (intersects(nodes1[edges1[i][0]], nodes1[edges1[i][1]], nodes1[edges1[j][0]], nodes1[edges1[j][1]])) count++;
         }
       }
       return count;
     }
 
-    function initGame() {
-      gameOver = false;
-      gameWon = false;
-      timeLeft = 60.0;
-      draggedNode = null;
-
+    function initLevel1() {
+      gameOver1 = false; gameWon1 = false; timeLeft1 = 60.0; draggedNode1 = null;
       generateStarWebGraph();
-      
-      document.getElementById('timer').innerText = timeLeft.toFixed(1);
-      
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        if (gameOver) return;
-        timeLeft -= 0.1;
-        document.getElementById('timer').innerText = Math.max(0, timeLeft).toFixed(1);
-
-        if (timeLeft <= 0) {
-          gameOver = true;
-          clearInterval(timerInterval);
-          draw();
-        }
+      document.getElementById('timer1').innerText = timeLeft1.toFixed(1);
+      clearInterval(timerInterval1);
+      timerInterval1 = setInterval(() => {
+        if (gameOver1) return;
+        timeLeft1 -= 0.1;
+        document.getElementById('timer1').innerText = Math.max(0, timeLeft1).toFixed(1);
+        if (timeLeft1 <= 0) { gameOver1 = true; clearInterval(timerInterval1); draw1(); }
       }, 100);
-
-      draw();
+      draw1();
     }
 
     canvas.addEventListener('mousedown', (e) => {
-      if (gameOver) return;
+      if (gameOver1) return;
       const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
-      nodes.forEach(node => {
-        const dist = Math.hypot(node.x - mouseX, node.y - mouseY);
-        if (dist < NODE_RADIUS + 6) {
-          draggedNode = node;
-        }
-      });
+      const mX = e.clientX - rect.left, mY = e.clientY - rect.top;
+      nodes1.forEach(n => { if (Math.hypot(n.x - mX, n.y - mY) < NODE_RADIUS + 6) draggedNode1 = n; });
     });
 
     canvas.addEventListener('mousemove', (e) => {
-      if (draggedNode && !gameOver) {
+      if (draggedNode1 && !gameOver1) {
         const rect = canvas.getBoundingClientRect();
-        draggedNode.x = Math.max(NODE_RADIUS, Math.min(canvas.width - NODE_RADIUS, e.clientX - rect.left));
-        draggedNode.y = Math.max(NODE_RADIUS, Math.min(canvas.height - NODE_RADIUS, e.clientY - rect.top));
-        draw();
+        draggedNode1.x = Math.max(NODE_RADIUS, Math.min(canvas.width - NODE_RADIUS, e.clientX - rect.left));
+        draggedNode1.y = Math.max(NODE_RADIUS, Math.min(canvas.height - NODE_RADIUS, e.clientY - rect.top));
+        draw1();
       }
     });
 
-    window.addEventListener('mouseup', () => {
-      draggedNode = null;
-    });
+    window.addEventListener('mouseup', () => draggedNode1 = null);
 
-    function draw() {
+    function draw1() {
       ctx.fillStyle = '#07140c';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      const currentCrossings = countCrossings();
+      const crossings = countCrossings1();
       const countEl = document.getElementById('crossings');
-      countEl.innerText = currentCrossings;
+      countEl.innerText = crossings;
+      if (crossings === 0) countEl.classList.add('zero'); else countEl.classList.remove('zero');
 
-      if (currentCrossings === 0) {
-        countEl.classList.add('zero');
-      } else {
-        countEl.classList.remove('zero');
-      }
-
-      // Rysowanie linii
-      edges.forEach(edge => {
-        const n1 = nodes[edge[0]];
-        const n2 = nodes[edge[1]];
-
-        let isIntersected = false;
-        for (let otherEdge of edges) {
-          if (edge === otherEdge) continue;
-          if (intersects(n1, n2, nodes[otherEdge[0]], nodes[otherEdge[1]])) {
-            isIntersected = true;
-            break;
-          }
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(n1.x, n1.y);
-        ctx.lineTo(n2.x, n2.y);
-        ctx.lineWidth = 2;
-
-        if (isIntersected) {
-          ctx.strokeStyle = '#ff3366';
-          ctx.shadowBlur = 4;
-          ctx.shadowColor = '#ff3366';
-        } else {
-          ctx.strokeStyle = '#00ff88';
-          ctx.shadowBlur = 6;
-          ctx.shadowColor = '#00ff88';
-        }
+      edges1.forEach(e => {
+        const n1 = nodes1[e[0]], n2 = nodes1[e[1]];
+        let isIntersected = edges1.some(oE => e !== oE && intersects(n1, n2, nodes1[oE[0]], nodes1[oE[1]]));
+        ctx.beginPath(); ctx.moveTo(n1.x, n1.y); ctx.lineTo(n2.x, n2.y); ctx.lineWidth = 2;
+        ctx.strokeStyle = isIntersected ? '#ff3366' : '#00ff88';
+        ctx.shadowBlur = isIntersected ? 4 : 6;
+        ctx.shadowColor = ctx.strokeStyle;
         ctx.stroke();
       });
 
-      // Rysowanie punktów (wszystkie identyczne)
-      nodes.forEach(node => {
-        ctx.fillStyle = '#00ff88';
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#00ff88';
-        
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, NODE_RADIUS, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowBlur = 0;
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, 3, 0, Math.PI * 2);
-        ctx.fill();
+      nodes1.forEach(n => {
+        ctx.fillStyle = '#00ff88'; ctx.shadowBlur = 10; ctx.shadowColor = '#00ff88';
+        ctx.beginPath(); ctx.arc(n.x, n.y, NODE_RADIUS, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ffffff'; ctx.shadowBlur = 0;
+        ctx.beginPath(); ctx.arc(n.x, n.y, 3, 0, Math.PI * 2); ctx.fill();
       });
 
-      // Wygrana
-      if (currentCrossings === 0 && !gameOver) {
-        gameWon = true;
-        gameOver = true;
-        clearInterval(timerInterval);
-      }
+      if (crossings === 0 && !gameOver1) { gameWon1 = true; gameOver1 = true; clearInterval(timerInterval1); }
 
-      // Ekran końcowy
-      if (gameOver) {
+      if (gameOver1) {
         ctx.fillStyle = 'rgba(5, 13, 8, 0.88)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
         ctx.textAlign = 'center';
-        if (gameWon) {
-          ctx.fillStyle = '#00ff88';
-          ctx.font = 'bold 24px Segoe UI';
-          ctx.fillText('🔓 FLEECA ROZPRACOWANA!', canvas.width / 2, canvas.height / 2 - 10);
-          ctx.fillStyle = '#fff';
-          ctx.font = '14px Segoe UI';
-          ctx.fillText('Sieć pomyślnie rozplątana!', canvas.width / 2, canvas.height / 2 + 20);
-        } else {
-          ctx.fillStyle = '#ff3366';
-          ctx.font = 'bold 24px Segoe UI';
-          ctx.fillText('💥 ALARM BANKOWY!', canvas.width / 2, canvas.height / 2 - 10);
-          ctx.fillStyle = '#fff';
-          ctx.font = '14px Segoe UI';
-          ctx.fillText('Czas minął! Nie udało się rozplątać sieci.', canvas.width / 2, canvas.height / 2 + 20);
-        }
+        ctx.fillStyle = gameWon1 ? '#00ff88' : '#ff3366';
+        ctx.font = 'bold 22px Segoe UI';
+        ctx.fillText(gameWon1 ? '🔓 FLEECA ROZPRACOWANA!' : '💥 ALARM BANKOWY!', canvas.width / 2, canvas.height / 2 - 10);
       }
     }
 
-    initGame();
+    /* ========================================================= */
+    /* --- LOGIKA POZIOMU 2: ZAPAMIĘTYWANIE MIN --- */
+    /* ========================================================= */
+    const GRID_SIZE = 8, TOTAL_MINES = 8, MEMORY_TIME = 10.0, TARGET_STAGES = 2;
+    let mines2 = [], selectedMines2 = [], currentStage2 = 0, isMemoryPhase2 = false, timerInterval2 = null;
+
+    function createGrid2() {
+      const gridEl = document.getElementById('grid2');
+      gridEl.innerHTML = '';
+      for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell-2');
+        cell.addEventListener('click', () => handleCellClick2(i));
+        gridEl.appendChild(cell);
+      }
+    }
+
+    function initLevel2() {
+      currentStage2 = 0;
+      document.getElementById('resultOverlay2').style.display = 'none';
+      createGrid2();
+      startMemoryPhase2();
+    }
+
+    function startMemoryPhase2() {
+      isMemoryPhase2 = true; selectedMines2 = [];
+      mines2 = [];
+      while (mines2.length < TOTAL_MINES) {
+        let r = Math.floor(Math.random() * 64);
+        if (!mines2.includes(r)) mines2.push(r);
+      }
+
+      document.getElementById('statusText2').innerText = "ZAPAMIĘTAJ MINY";
+      document.getElementById('minesCounter2').innerText = `0/${TOTAL_MINES}`;
+      document.getElementById('stageCounter2').innerText = `${currentStage2}/${TARGET_STAGES}`;
+
+      const cells = document.querySelectorAll('.cell-2');
+      cells.forEach((c, i) => { c.className = 'cell-2'; if (mines2.includes(i)) c.classList.add('has-mine'); });
+
+      let start = Date.now();
+      clearInterval(timerInterval2);
+      timerInterval2 = setInterval(() => {
+        let elapsed = (Date.now() - start) / 1000;
+        let rem = Math.max(0, MEMORY_TIME - elapsed);
+        document.getElementById('progressFill2').style.width = `${(rem / MEMORY_TIME) * 100}%`;
+        if (rem <= 0) { clearInterval(timerInterval2); startSelectionPhase2(); }
+      }, 50);
+    }
+
+    function startSelectionPhase2() {
+      isMemoryPhase2 = false;
+      document.getElementById('statusText2').innerText = "ZAZNACZ MINY";
+      document.querySelectorAll('.cell-2').forEach(c => c.className = 'cell-2');
+    }
+
+    function handleCellClick2(idx) {
+      if (isMemoryPhase2) return;
+      const cells = document.querySelectorAll('.cell-2');
+      if (selectedMines2.includes(idx)) {
+        selectedMines2 = selectedMines2.filter(i => i !== idx);
+        cells[idx].classList.remove('has-mine');
+      } else {
+        if (selectedMines2.length >= TOTAL_MINES) return;
+        selectedMines2.push(idx);
+        cells[idx].classList.add('has-mine');
+      }
+      document.getElementById('minesCounter2').innerText = `${selectedMines2.length}/${TOTAL_MINES}`;
+      if (selectedMines2.length === TOTAL_MINES) verify2();
+    }
+
+    function verify2() {
+      let isCorrect = selectedMines2.every(m => mines2.includes(m));
+      const cells = document.querySelectorAll('.cell-2');
+      if (!isCorrect) {
+        selectedMines2.forEach(idx => { if (!mines2.includes(idx)) cells[idx].classList.add('wrong'); });
+      }
+
+      if (isCorrect) {
+        currentStage2++;
+        if (currentStage2 >= TARGET_STAGES) endGame2(true, "SYSTEM ZAKOŃCZONY SUKCESEM!");
+        else setTimeout(startMemoryPhase2, 1000);
+      } else {
+        setTimeout(() => endGame2(false, "BŁĘDNE POŁOŻENIE MIN!"), 1000);
+      }
+    }
+
+    function endGame2(win, msg) {
+      clearInterval(timerInterval2);
+      const overlay = document.getElementById('resultOverlay2');
+      overlay.style.display = 'flex';
+      const title = document.getElementById('resultTitle2');
+      title.innerText = win ? "🔓 FLEECA ZAMKNIĘTA" : "💥 ALARM WŁĄCZONY";
+      title.style.color = win ? "#00ff88" : "#ff3366";
+      document.getElementById('resultSub2').innerText = msg;
+    }
+
+    // Uruchomienie domyślne na poziomie 1
+    initLevel1();
   </script>
 </body>
 </html>
