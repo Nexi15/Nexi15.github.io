@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleeca - Untangle Network</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #050d08;
+      background-image: radial-gradient(#0e2618 1px, transparent 1px);
+      background-size: 16px 16px;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      user-select: none;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #00ff88;
+      text-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+      letter-spacing: 1px;
+    }
+
+    .info-bar {
+      display: flex;
+      gap: 30px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      background: #0b1e13;
+      padding: 8px 20px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+
+    .crossings-count {
+      color: #ff3366;
+    }
+
+    .crossings-count.zero {
+      color: #00ff88;
+    }
+
+    #gameCanvas {
+      background: #07140c;
+      border: 2px solid #00ff88;
+      border-radius: 8px;
+      box-shadow: 0 0 25px rgba(0, 255, 136, 0.15);
+      cursor: grab;
+    }
+
+    #gameCanvas:active {
+      cursor: grabbing;
+    }
+
+    .difficulty-selector {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .diff-btn {
+      background: #0b1e13;
+      border: 1px solid #00ff88;
+      color: #00ff88;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .diff-btn.active, .diff-btn:hover {
+      background: #00ff88;
+      color: #050d08;
+      box-shadow: 0 0 10px #00ff88;
+    }
+
+    .instructions {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #6a997a;
+    }
+
+    .controls {
+      margin-top: 15px;
+      display: flex;
+      gap: 15px;
+    }
+
+    .btn {
+      background: #0d2818;
+      border: 1px solid #00ff88;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: #00ff88;
+      color: #050d08;
+      box-shadow: 0 0 15px #00ff88;
+    }
+
+    .back-btn {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .back-btn:hover {
+      background: #fff;
+      color: #000;
+      box-shadow: 0 0 10px #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>UNTANGLE [FLECCA]</h1>
+  </div>
+
+  <div class="info-bar">
+    <div>Przecięcia: <span id="crossings" class="crossings-count">0</span></div>
+    <div>Czas: <span id="timer">60.0</span>s</div>
+  </div>
+
+  <canvas id="gameCanvas" width="460" height="380"></canvas>
+
+  <div class="difficulty-selector">
+    <span style="font-size: 0.85rem; color: #888;">Poziom:</span>
+    <button class="diff-btn active" onclick="setDifficulty(6, this)">ŁATWY</button>
+    <button class="diff-btn" onclick="setDifficulty(8, this)">ŚREDNI</button>
+    <button class="diff-btn" onclick="setDifficulty(10, this)">TRUDNY</button>
+  </div>
+
+  <div class="instructions">
+    Przeciągaj punkty myszką tak, aby żadne linie się nie przecinały.
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="initGame()">RESET / START</button>
+    <a href="../index.html" class="btn back-btn">⬅ Powrót do menu</a>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let nodeCount = 6;
+    const NODE_RADIUS = 11;
+
+    let nodes = [];
+    let edges = [];
+    let draggedNode = null;
+    let timeLeft = 60.0;
+    let timerInterval = null;
+    let gameOver = false;
+    let gameWon = false;
+
+    function setDifficulty(count, btn) {
+      nodeCount = count;
+      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      initGame();
+    }
+
+    function intersects(a, b, c, d) {
+      if ((a.x === c.x && a.y === c.y) || (a.x === d.x && a.y === d.y) ||
+          (b.x === c.x && b.y === c.y) || (b.x === d.x && b.y === d.y)) {
+        return false;
+      }
+
+      function ccw(p1, p2, p3) {
+        return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
+      }
+
+      return (ccw(a, c, d) !== ccw(b, c, d)) && (ccw(a, b, c) !== ccw(a, b, d));
+    }
+
+    function generateGraph() {
+      nodes = [];
+      edges = [];
+
+      const radius = 120;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      for (let i = 0; i < nodeCount; i++) {
+        const angle = (i / nodeCount) * Math.PI * 2;
+        nodes.push({
+          x: centerX + radius * Math.cos(angle),
+          y: centerY + radius * Math.sin(angle)
+        });
+      }
+
+      for (let i = 0; i < nodeCount; i++) {
+        edges.push([i, (i + 1) % nodeCount]);
+      }
+
+      if (nodeCount >= 8) edges.push([0, 3], [2, 5]);
+      if (nodeCount >= 10) edges.push([1, 6], [4, 8]);
+
+      // Pomieszanie punktów
+      nodes.forEach(node => {
+        node.x = Math.floor(40 + Math.random() * (canvas.width - 80));
+        node.y = Math.floor(40 + Math.random() * (canvas.height - 80));
+      });
+    }
+
+    function countCrossings() {
+      let count = 0;
+      for (let i = 0; i < edges.length; i++) {
+        for (let j = i + 1; j < edges.length; j++) {
+          const e1 = edges[i];
+          const e2 = edges[j];
+          if (intersects(nodes[e1[0]], nodes[e1[1]], nodes[e2[0]], nodes[e2[1]])) {
+            count++;
+          }
+        }
+      }
+      return count;
+    }
+
+    function initGame() {
+      gameOver = false;
+      gameWon = false;
+      timeLeft = 60.0;
+      draggedNode = null;
+
+      generateGraph();
+      
+      document.getElementById('timer').innerText = timeLeft.toFixed(1);
+      
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (gameOver) return;
+        timeLeft -= 0.1;
+        document.getElementById('timer').innerText = Math.max(0, timeLeft).toFixed(1);
+
+        if (timeLeft <= 0) {
+          gameOver = true;
+          clearInterval(timerInterval);
+          draw();
+        }
+      }, 100);
+
+      draw();
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (gameOver) return;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      nodes.forEach(node => {
+        const dist = Math.hypot(node.x - mouseX, node.y - mouseY);
+        if (dist < NODE_RADIUS + 6) {
+          draggedNode = node;
+        }
+      });
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (draggedNode && !gameOver) {
+        const rect = canvas.getBoundingClientRect();
+        draggedNode.x = Math.max(NODE_RADIUS, Math.min(canvas.width - NODE_RADIUS, e.clientX - rect.left));
+        draggedNode.y = Math.max(NODE_RADIUS, Math.min(canvas.height - NODE_RADIUS, e.clientY - rect.top));
+        draw();
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      draggedNode = null;
+    });
+
+    function draw() {
+      ctx.fillStyle = '#07140c';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const currentCrossings = countCrossings();
+      const countEl = document.getElementById('crossings');
+      countEl.innerText = currentCrossings;
+
+      if (currentCrossings === 0) {
+        countEl.classList.add('zero');
+      } else {
+        countEl.classList.remove('zero');
+      }
+
+      // Rysowanie linii
+      edges.forEach(edge => {
+        const n1 = nodes[edge[0]];
+        const n2 = nodes[edge[1]];
+
+        let isIntersected = false;
+        for (let otherEdge of edges) {
+          if (edge === otherEdge) continue;
+          if (intersects(n1, n2, nodes[otherEdge[0]], nodes[otherEdge[1]])) {
+            isIntersected = true;
+            break;
+          }
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(n1.x, n1.y);
+        ctx.lineTo(n2.x, n2.y);
+        ctx.lineWidth = 2;
+
+        if (isIntersected) {
+          ctx.strokeStyle = '#ff3366';
+          ctx.shadowBlur = 4;
+          ctx.shadowColor = '#ff3366';
+        } else {
+          ctx.strokeStyle = '#00ff88';
+          ctx.shadowBlur = 6;
+          ctx.shadowColor = '#00ff88';
+        }
+        ctx.stroke();
+      });
+
+      // Rysowanie punktów
+      nodes.forEach(node => {
+        ctx.fillStyle = '#00ff88';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#00ff88';
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, NODE_RADIUS, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Sprawdzenie wygranej
+      if (currentCrossings === 0 && !gameOver) {
+        gameWon = true;
+        gameOver = true;
+        clearInterval(timerInterval);
+      }
+
+      // Ekran końcowy
+      if (gameOver) {
+        ctx.fillStyle = 'rgba(5, 13, 8, 0.88)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = 'center';
+        if (gameWon) {
+          ctx.fillStyle = '#00ff88';
+          ctx.font = 'bold 24px Segoe UI';
+          ctx.fillText('🔓 FLECCA ROZPRACOWANA!', canvas.width / 2, canvas.height / 2 - 10);
+          ctx.fillStyle = '#fff';
+          ctx.font = '14px Segoe UI';
+          ctx.fillText('System został pomyślnie zresetowany!', canvas.width / 2, canvas.height / 2 + 20);
+        } else {
+          ctx.fillStyle = '#ff3366';
+          ctx.font = 'bold 24px Segoe UI';
+          ctx.fillText('💥 ALARM BANKOWY!', canvas.width / 2, canvas.height / 2 - 10);
+          ctx.fillStyle = '#fff';
+          ctx.font = '14px Segoe UI';
+          ctx.fillText('Czas minął! Nie rozplątano sieci.', canvas.width / 2, canvas.height / 2 + 20);
+        }
+      }
+    }
+
+    initGame();
+  </script>
+</body>
+</html>
