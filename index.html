@@ -91,12 +91,12 @@
     /* Holograficzne Tło w Panelu */
     .holo-bg-icon {
       position: absolute;
-      right: -30px;
-      bottom: -30px;
-      width: 300px;
-      height: 300px;
+      right: -20px;
+      bottom: -20px;
+      width: 280px;
+      height: 280px;
       color: var(--primary);
-      opacity: 0.06;
+      opacity: 0.08;
       pointer-events: none;
       transition: all 0.6s ease;
       transform: rotate(-10deg);
@@ -104,7 +104,6 @@
 
     .holo-bg-icon svg {
       width: 100%; height: 100%;
-      fill: currentColor;
     }
 
     .showcase-header {
@@ -286,9 +285,8 @@
     }
 
     .option-icon svg {
-      width: 24px;
-      height: 24px;
-      fill: currentColor;
+      width: 26px;
+      height: 26px;
     }
 
     .option-name {
@@ -358,7 +356,9 @@
     <div class="showcase-panel" id="showcasePanel">
       
       <div class="holo-bg-icon" id="holoBg">
-        <svg id="holoSvg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+        <svg id="holoSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18h6m-4 3h2M12 2a6 6 0 0 0-6 6c0 2.2 1.2 4.1 3 5.2V15a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-1.8c1.8-1.1 3-3 3-5.2a6 6 0 0 0-6-6z"/>
+        </svg>
       </div>
 
       <div class="showcase-header">
@@ -377,7 +377,7 @@
 
       <a href="lightsout/index.html" class="launch-btn" id="launchBtn">
         <span>INICJUJ HACK</span>
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
     </div>
 
@@ -385,25 +385,27 @@
     <div class="selector-panel">
       <div class="selector-title">// MODUŁY TRENINGOWE</div>
 
-      <!-- 1. Lights Out (Żarówka) -->
+      <!-- 1. Lights Out -->
       <div class="option-card active" style="--opt-color: #00f0ff; --opt-glow: rgba(0, 240, 255, 0.3);" 
            data-title="LIGHTS OUT" 
            data-desc="Trening matrycowy polegający na wygaszaniu połączeń w jak najkrótszym czasie. Wymaga wyobraźni przestrzennej i błyskawicznego planowania."
            data-diff="MEDIUM"
            data-color="#00f0ff"
            data-glow="rgba(0, 240, 255, 0.4)"
-           data-href="lights-out/index.html"
-           data-svg='<path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/>'>
+           data-href="lightsout/index.html"
+           data-svg='<path d="M9 18h6m-4 3h2M12 2a6 6 0 0 0-6 6c0 2.2 1.2 4.1 3 5.2V15a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-1.8c1.8-1.1 3-3 3-5.2a6 6 0 0 0-6-6z"/>'>
         <div class="option-info">
           <div class="option-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18h6m-4 3h2M12 2a6 6 0 0 0-6 6c0 2.2 1.2 4.1 3 5.2V15a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-1.8c1.8-1.1 3-3 3-5.2a6 6 0 0 0-6-6z"/>
+            </svg>
           </div>
           <div class="option-name">LIGHTS OUT</div>
         </div>
         <div class="active-indicator"></div>
       </div>
 
-      <!-- 2. Alarm (Dzwonek) -->
+      <!-- 2. Alarm -->
       <div class="option-card" style="--opt-color: #ffe600; --opt-glow: rgba(255, 230, 0, 0.3);" 
            data-title="ALARM" 
            data-desc="Test pamięci krótkotrwałej i odtwarzanie sekwencji sygnałów ostrzegawczych pod narzuconą presją zapisu danych."
@@ -411,17 +413,19 @@
            data-color="#ffe600"
            data-glow="rgba(255, 230, 0, 0.4)"
            data-href="alarm/index.html"
-           data-svg='<path d="M12 2a2 2 0 0 0-2 2v.29C7.12 5.14 5 7.82 5 11v5l-2 2v1h18v-1l-2-2v-5c0-3.18-2.12-5.86-5-6.71V4a2 2 0 0 0-2-2m-2 20a2 2 0 0 0 4 0z"/>'>
+           data-svg='<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>'>
         <div class="option-info">
           <div class="option-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 0-2 2v.29C7.12 5.14 5 7.82 5 11v5l-2 2v1h18v-1l-2-2v-5c0-3.18-2.12-5.86-5-6.71V4a2 2 0 0 0-2-2m-2 20a2 2 0 0 0 4 0z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
           </div>
           <div class="option-name">ALARM</div>
         </div>
         <div class="active-indicator"></div>
       </div>
 
-      <!-- 3. Ammunation (Pistolet) -->
+      <!-- 3. Ammunation (NOWA BROŃ/PISTOLET) -->
       <div class="option-card" style="--opt-color: #ff007f; --opt-glow: rgba(255, 0, 127, 0.3);" 
            data-title="AMMUNATION" 
            data-desc="Maksymalny test czasu reakcji oraz koordynacji. Wymaga wyeliminowania celów w ułamkach sekund."
@@ -429,17 +433,19 @@
            data-color="#ff007f"
            data-glow="rgba(255, 0, 127, 0.4)"
            data-href="ammunation/index.html"
-           data-svg='<path d="M22 9V7a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v1H3a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5v6.5a1.5 1.5 0 0 0 1.5 1.5H12a1 1 0 0 0 1-1v-4h3l3.3 4.4a1 1 0 0 0 .8.4h1.9a1 1 0 0 0 1-1V10a1 1 0 0 0-1-1z"/>'>
+           data-svg='<path d="M3 11h11l3-3h4v4h-2v3h-3l-2 5h-4l1-5H9l-2-4H3v-4zM13 11v3"/>'>
         <div class="option-info">
           <div class="option-icon">
-            <svg viewBox="0 0 24 24"><path d="M22 9V7a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v1H3a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5v6.5a1.5 1.5 0 0 0 1.5 1.5H12a1 1 0 0 0 1-1v-4h3l3.3 4.4a1 1 0 0 0 .8.4h1.9a1 1 0 0 0 1-1V10a1 1 0 0 0-1-1z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 11h11l3-3h4v4h-2v3h-3l-2 5h-4l1-5H9l-2-4H3v-4zM13 11v3"/>
+            </svg>
           </div>
           <div class="option-name">AMMUNATION</div>
         </div>
         <div class="active-indicator"></div>
       </div>
 
-      <!-- 4. Jacht (Jacht / Żaglówka) -->
+      <!-- 4. Jacht -->
       <div class="option-card" style="--opt-color: #ff3355; --opt-glow: rgba(255, 51, 85, 0.3);" 
            data-title="JACHT" 
            data-desc="Przełamywanie szyfrów morskich systemów nawigacji. Złożony ciąg sekwencyjny dla zaawansowanych."
@@ -447,17 +453,19 @@
            data-color="#ff3355"
            data-glow="rgba(255, 51, 85, 0.4)"
            data-href="jacht/index.html"
-           data-svg='<path d="M11 2v11.7l-7.3-2.1L11 2m2 0l7.3 9.6-7.3 2.1V2M2 16h20l-2.5 5h-15L2 16z"/>'>
+           data-svg='<path d="M12 2v11m0 0l-7-2 7 2zm0 0l8-3-8 3zM3 17h18l-2 4H5l-2-4z"/>'>
         <div class="option-info">
           <div class="option-icon">
-            <svg viewBox="0 0 24 24"><path d="M11 2v11.7l-7.3-2.1L11 2m2 0l7.3 9.6-7.3 2.1V2M2 16h20l-2.5 5h-15L2 16z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v11m0 0l-7-2 7 2zm0 0l8-3-8 3zM3 17h18l-2 4H5l-2-4z"/>
+            </svg>
           </div>
           <div class="option-name">JACHT</div>
         </div>
         <div class="active-indicator"></div>
       </div>
 
-      <!-- 5. Fleeca (Worek z kasą) -->
+      <!-- 5. Fleeca (NOWY WOREK Z KASĄ) -->
       <div class="option-card" style="--opt-color: #00ff66; --opt-glow: rgba(0, 255, 102, 0.3);" 
            data-title="FLEECA" 
            data-desc="Symulacja przełamywania zabezpieczeń skarbca banku Fleeca. Połączenie precyzji i zimnej krwi."
@@ -465,10 +473,12 @@
            data-color="#00ff66"
            data-glow="rgba(0, 255, 102, 0.4)"
            data-href="fleeca/index.html"
-           data-svg='<path d="M15 3H9a1 1 0 0 0-1 1v1a4 4 0 0 0-3 3.86C5 12.8 8 13.5 8 15s-1.5 1.5-3 1v2.1A6 6 0 0 0 8 21.86V23h3v-1.06c3.26-.44 5-2.6 5-4.94 0-4-3-4.5-3-6s1.5-1.5 3-1V8A4 4 0 0 0 13 5V4a1 1 0 0 0-1-1z"/>'>
+           data-svg='<path d="M6 9h12L17 4H7L6 9zm0 0c0 7 2.5 11 6 11s6-4 6-11M12 12v4m-1.5-3c.5-.5 2.5-.5 3 0s-3 1.5-2 2 2.5.5 3 0"/>'>
         <div class="option-info">
           <div class="option-icon">
-            <svg viewBox="0 0 24 24"><path d="M15 3H9a1 1 0 0 0-1 1v1a4 4 0 0 0-3 3.86C5 12.8 8 13.5 8 15s-1.5 1.5-3 1v2.1A6 6 0 0 0 8 21.86V23h3v-1.06c3.26-.44 5-2.6 5-4.94 0-4-3-4.5-3-6s1.5-1.5 3-1V8A4 4 0 0 0 13 5V4a1 1 0 0 0-1-1z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9h12L17 4H7L6 9zm0 0c0 7 2.5 11 6 11s6-4 6-11M12 12v4m-1.5-3c.5-.5 2.5-.5 3 0s-3 1.5-2 2 2.5.5 3 0"/>
+            </svg>
           </div>
           <div class="option-name">FLEECA</div>
         </div>
