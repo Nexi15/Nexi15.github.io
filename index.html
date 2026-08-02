@@ -3,60 +3,250 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OnBeat.GG Hacks</title>
-  <link rel="stylesheet" href="style.css">
+  <title>GTA RP Mini-Games Hub</title>
+  <style>
+    /* Reset & Podstawy */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #0b0d0e;
+      background-image: radial-gradient(#1f2428 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* Nagłówek */
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #fff 30%, #888);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    header p {
+      color: #8a8f98;
+      font-size: 1.05rem;
+      letter-spacing: 1px;
+    }
+
+    /* Siatka z Kartami */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 25px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    /* Pojedyncza Karta */
+    .card {
+      background: rgba(18, 22, 25, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 30px 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 320px;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Tytuł Karty */
+    .card-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-top: auto;
+      margin-bottom: auto;
+      text-align: center;
+      transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    /* Stopka Karty */
+    .card-footer {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .line {
+      height: 2px;
+      width: 60%;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-text {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      transition: all 0.3s ease;
+    }
+
+    /* Efekt Hover na Kartę */
+    .card:hover {
+      transform: translateY(-10px) scale(1.02);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .card:hover .line {
+      width: 100%;
+    }
+
+    .card:hover .card-title {
+      transform: scale(1.08);
+    }
+
+    .card:hover .btn-text {
+      opacity: 1;
+      letter-spacing: 3px;
+    }
+
+    /* ========================================================= */
+    /* --- KOLORY I NEON GLOW DLA POSZCZEGÓLNYCH KART --- */
+    /* ========================================================= */
+
+    /* 1. Cyan (Lights Out) */
+    .card-cyan .card-title { color: #ffffff; }
+    .card-cyan .line { background: #00bcd4; box-shadow: 0 0 8px #00bcd4; }
+    .card-cyan .btn-text { color: #00bcd4; }
+    .card-cyan:hover {
+      border-color: rgba(0, 188, 212, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 188, 212, 0.25), inset 0 0 15px rgba(0, 188, 212, 0.1);
+    }
+    .card-cyan:hover .card-title { color: #00bcd4; text-shadow: 0 0 15px rgba(0, 188, 212, 0.8); }
+
+    /* 2. Yellow (Alarm) */
+    .card-yellow .card-title { color: #ffffff; }
+    .card-yellow .line { background: #d4cf00; box-shadow: 0 0 8px #d4cf00; }
+    .card-yellow .btn-text { color: #d4cf00; }
+    .card-yellow:hover {
+      border-color: rgba(212, 207, 0, 0.5);
+      box-shadow: 0 10px 30px rgba(212, 207, 0, 0.25), inset 0 0 15px rgba(212, 207, 0, 0.1);
+    }
+    .card-yellow:hover .card-title { color: #d4cf00; text-shadow: 0 0 15px rgba(212, 207, 0, 0.8); }
+
+    /* 3. Pink (Ammunation) */
+    .card-pink .card-title { color: #ff007f; }
+    .card-pink .line { background: #ff007f; box-shadow: 0 0 8px #ff007f; }
+    .card-pink .btn-text { color: #ff007f; }
+    .card-pink:hover {
+      border-color: rgba(255, 0, 127, 0.5);
+      box-shadow: 0 10px 30px rgba(255, 0, 127, 0.25), inset 0 0 15px rgba(255, 0, 127, 0.1);
+    }
+    .card-pink:hover .card-title { text-shadow: 0 0 18px rgba(255, 0, 127, 0.9); }
+
+    /* 4. Red (Jacht) */
+    .card-red .card-title { color: #ff3366; }
+    .card-red .line { background: #ff3366; box-shadow: 0 0 8px #ff3366; }
+    .card-red .btn-text { color: #ff3366; }
+    .card-red:hover {
+      border-color: rgba(255, 51, 102, 0.5);
+      box-shadow: 0 10px 30px rgba(255, 51, 102, 0.25), inset 0 0 15px rgba(255, 51, 102, 0.1);
+    }
+    .card-red:hover .card-title { text-shadow: 0 0 18px rgba(255, 51, 102, 0.9); }
+
+    /* 5. Green (Fleeca) */
+    .card-green .card-title { color: #00e640; }
+    .card-green .line { background: #00e640; box-shadow: 0 0 8px #00e640; }
+    .card-green .btn-text { color: #00e640; }
+    .card-green:hover {
+      border-color: rgba(0, 230, 64, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 230, 64, 0.25), inset 0 0 15px rgba(0, 230, 64, 0.1);
+    }
+    .card-green:hover .card-title { text-shadow: 0 0 18px rgba(0, 230, 64, 0.9); }
+
+    /* Responsywność */
+    @media (max-width: 600px) {
+      header h1 { font-size: 2rem; }
+      .grid-container { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
-  <main class="grid-container">
-    
-    <!-- Karta 1: Lights Out (PODLINKOWANA) -->
-    <div class="card card-cyan">
-      <h2 class="card-title">Lights Out</h2>
+  <header>
+    <h1>Wybierz MinigrĘ</h1>
+    <p>Trening Hackowania GTA RP</p>
+  </header>
+
+  <div class="grid-container">
+
+    <!-- Lights Out -->
+    <a href="lightsout/index.html" class="card card-cyan">
+      <div class="card-title">LIGHTS OUT</div>
       <div class="card-footer">
         <div class="line"></div>
-        <!-- Tutaj jest ścieżka do folderu lights-out -->
-        <a href="lights-out/index.html" class="btn">WYBIERZ GRĘ</a>
+        <span class="btn-text">Zagraj ➔</span>
       </div>
-    </div>
+    </a>
 
-    <!-- Karta 2: Alarm -->
-    <div class="card card-yellow">
-      <h2 class="card-title">Domek Alarm</h2>
+    <!-- Alarm -->
+    <a href="alarm/index.html" class="card card-yellow">
+      <div class="card-title">ALARM</div>
       <div class="card-footer">
         <div class="line"></div>
-        <a href="alarm/index.html" class="btn">WYBIERZ GRĘ</a>
+        <span class="btn-text">Zagraj ➔</span>
       </div>
-    </div>
+    </a>
 
-    <!-- Karta 3: Ammunition -->
-    <div class="card card-pink">
-      <h2 class="card-title">Ammunation</h2>
+    <!-- Ammunation -->
+    <a href="ammunation/index.html" class="card card-pink">
+      <div class="card-title">AMMUNATION</div>
       <div class="card-footer">
         <div class="line"></div>
-        <a href="ammunation/index.html" class="btn">WYBIERZ GRĘ</a>
+        <span class="btn-text">Zagraj ➔</span>
       </div>
-    </div>
+    </a>
 
-<!-- Karta 4: Jacht -->
-<div class="card card-red">
-  <h2 class="card-title">Jacht</h2>
-  <div class="card-footer">
-    <div class="line"></div>
-    <a href="jacht/index.html" class="btn">WYBIERZ GRĘ</a>
+    <!-- Jacht -->
+    <a href="jacht/index.html" class="card card-red">
+      <div class="card-title">JACHT</div>
+      <div class="card-footer">
+        <div class="line"></div>
+        <span class="btn-text">Zagraj ➔</span>
+      </div>
+    </a>
+
+    <!-- Fleeca -->
+    <a href="fleeca/index.html" class="card card-green">
+      <div class="card-title">FLEECA</div>
+      <div class="card-footer">
+        <div class="line"></div>
+        <span class="btn-text">Zagraj ➔</span>
+      </div>
+    </a>
+
   </div>
-</div>
-    
-<!-- Karta 5: Fleeca -->
-<div class="card card-green">
-  <h2 class="card-title">Fleeca</h2>
-  <div class="card-footer">
-    <div class="line"></div>
-    <a href="fleeca/index.html" class="btn">WYBIERZ GRĘ</a>
-  </div>
-</div>
-    
-  </main>
 
 </body>
 </html>
