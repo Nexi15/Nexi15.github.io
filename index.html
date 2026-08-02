@@ -32,15 +32,43 @@
       margin-bottom: 50px;
     }
 
+    /* ANIMOWANY GRADIENT RÓŻOWY DLA KOTWICY / NAGŁÓWKA */
     header h1 {
       font-size: 2.8rem;
       font-weight: 800;
       letter-spacing: 2px;
-      background: linear-gradient(135deg, #fff 30%, #888);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
       margin-bottom: 10px;
       text-transform: uppercase;
+      
+      /* Gradient przemieszczający się */
+      background: linear-gradient(
+        -45deg, 
+        #ff007f, 
+        #ff3366, 
+        #e040fb, 
+        #ff007f
+      );
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      
+      /* Animacja płynnego przejścia koloru */
+      animation: gradientPink 4s ease infinite;
+      
+      /* Neonowy poświata w tle */
+      filter: drop-shadow(0 0 12px rgba(255, 0, 127, 0.4));
+    }
+
+    @keyframes gradientPink {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
     }
 
     header p {
@@ -195,7 +223,7 @@
 <body>
 
   <header>
-    <h1>Wybierz MinigrĘ</h1>
+    <h1>Wybierz Hacka</h1>
     <p>Trening Hacków ONBEAT</p>
   </header>
 
