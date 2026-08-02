@@ -195,7 +195,7 @@
   </div>
 
   <div class="instructions">
-    Rozplącz kropki tak, aby stworzyć czystą pajęczynę bez przecinających się linii!
+    Ułóż kropki tak, aby rozplątać sieć wokół głównego węzła!
   </div>
 
   <div class="controls">
@@ -254,46 +254,31 @@
       return (ccw(a, c, d) !== ccw(b, c, d)) && (ccw(a, b, c) !== ccw(a, b, d));
     }
 
-    // Generator gwarantujący układy w kształcie PAJĘCZYNY (zawsze możliwe do ułożenia)
-    function generateSpiderWebGraph() {
+    // Generator: 1 kropka główna + pierścień z 3 połączeniami na kropkę
+    function generateStarWebGraph() {
       nodes = [];
       edges = [];
 
-      // Dzielimy kropki na pierścienie pajęczyny
-      let outerNodesCount = Math.ceil(nodeCount / 2);
-      let innerNodesCount = nodeCount - outerNodesCount;
-
-      if (nodeCount <= 5) {
-        // Dla małej liczby węzłów tworzymy zwykłą pętlę + szprychy
-        for (let i = 0; i < nodeCount; i++) {
-          nodes.push({ x: 0, y: 0 });
-          edges.push([i, (i + 1) % nodeCount]);
-        }
-        if (nodeCount > 3) edges.push([0, 2]);
-      } else {
-        // Generowanie zewnętrznego i wewnętrznego pierścienia pajęczyny
-        for (let i = 0; i < nodeCount; i++) {
-          nodes.push({ x: 0, y: 0 });
-        }
-
-        // Zewnętrzny pierścień
-        for (let i = 0; i < outerNodesCount; i++) {
-          edges.push([i, (i + 1) % outerNodesCount]);
-        }
-
-        // Wewnętrzny pierścień
-        for (let i = 0; i < innerNodesCount; i++) {
-          let currentIdx = outerNodesCount + i;
-          let nextIdx = outerNodesCount + ((i + 1) % innerNodesCount);
-          edges.push([currentIdx, nextIdx]);
-
-          // Połączenia "szprychowe" z zewnętrznym pierścieniem
-          let connectToOuter = Math.floor((i / innerNodesCount) * outerNodesCount);
-          edges.push([currentIdx, connectToOuter]);
-        }
+      // Tworzymy punkty
+      for (let i = 0; i < nodeCount; i++) {
+        nodes.push({ x: 0, y: 0, isCenter: (i === 0) });
       }
 
-      // Rozrzucamy kropki po ekranie (niszczymy czystą pajęczynę do ułożenia)
+      // Kropka index 0 to kropka główna.
+      // 1. Łączymy kropkę główną (0) ze WSZYSTKIMI pozostałymi (1 do nodeCount-1)
+      for (let i = 1; i < nodeCount; i++) {
+        edges.push([0, i]);
+      }
+
+      // 2. Pozostałe kropki łączymy w koło (każda dostaje +2 połączenia, więc ma łącznie 3)
+      const outerCount = nodeCount - 1;
+      for (let i = 0; i < outerCount; i++) {
+        let current = 1 + i;
+        let next = 1 + ((i + 1) % outerCount);
+        edges.push([current, next]);
+      }
+
+      // Rozrzucamy kropki losowo po planszy
       nodes.forEach(node => {
         node.x = Math.floor(50 + Math.random() * (canvas.width - 100));
         node.y = Math.floor(50 + Math.random() * (canvas.height - 100));
@@ -320,7 +305,7 @@
       timeLeft = 60.0;
       draggedNode = null;
 
-      generateSpiderWebGraph();
+      generateStarWebGraph();
       
       document.getElementById('timer').innerText = timeLeft.toFixed(1);
       
@@ -413,18 +398,24 @@
       });
 
       // Rysowanie punktów
-      nodes.forEach(node => {
-        ctx.fillStyle = '#00ff88';
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#00ff88';
+      nodes.forEach((node, index) => {
+        const isCenter = (index === 0);
+        
+        // Główny punkt wyróżniamy rozmiarem i kolorem (złoty/jasnozielony)
+        const radius = isCenter ? NODE_RADIUS + 3 : NODE_RADIUS;
+        
+        ctx.fillStyle = isCenter ? '#ffd700' : '#00ff88';
+        ctx.shadowBlur = isCenter ? 15 : 10;
+        ctx.shadowColor = isCenter ? '#ffd700' : '#00ff88';
+        
         ctx.beginPath();
-        ctx.arc(node.x, node.y, NODE_RADIUS, 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = '#ffffff';
         ctx.shadowBlur = 0;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, 3, 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, isCenter ? 4 : 3, 0, Math.PI * 2);
         ctx.fill();
       });
 
@@ -447,7 +438,7 @@
           ctx.fillText('🔓 FLEECA ROZPRACOWANA!', canvas.width / 2, canvas.height / 2 - 10);
           ctx.fillStyle = '#fff';
           ctx.font = '14px Segoe UI';
-          ctx.fillText('Pajęczyna rozplątana!', canvas.width / 2, canvas.height / 2 + 20);
+          ctx.fillText('Sieć pomyślnie rozplątana!', canvas.width / 2, canvas.height / 2 + 20);
         } else {
           ctx.fillStyle = '#ff3366';
           ctx.font = 'bold 24px Segoe UI';
