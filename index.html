@@ -3,17 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ONBEAT.GG HACKS</title>
+  <title>ONBEAT.GG // SYSTEM HACKING</title>
   <style>
+    :root {
+      --bg: #030508;
+      --card-bg: rgba(10, 14, 20, 0.65);
+      --border: rgba(255, 255, 255, 0.08);
+      --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      font-family: var(--font-main);
     }
 
     body {
-      background-color: #030507;
+      background-color: var(--bg);
       color: #fff;
       min-height: 100vh;
       display: flex;
@@ -25,7 +32,7 @@
       overflow-x: hidden;
     }
 
-    /* Tło - Canvas */
+    /* Tło - Dynamiczny Canvas */
     #bgCanvas {
       position: fixed;
       top: 0; left: 0;
@@ -34,282 +41,412 @@
       pointer-events: none;
     }
 
-    .wrapper {
+    /* Główny Kontener */
+    .app-container {
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 1200px;
+      max-width: 850px;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      gap: 30px;
     }
 
-    /* NAGŁÓWEK z efektem Glow + Neon */
+    /* HEADER SYSTEMOWY */
     header {
-      text-align: center;
-      margin-bottom: 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      border-left: 4px solid #ff007f;
+      padding-left: 20px;
       position: relative;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: #ff007f;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background-color: #ff007f;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ff007f;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
     }
 
     header h1 {
-      font-size: 3.5rem;
+      font-size: 2.8rem;
       font-weight: 900;
-      letter-spacing: 4px;
-      margin-bottom: 8px;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      background: linear-gradient(-45deg, #ff007f, #ff3366, #e040fb, #ff007f);
-      background-size: 300% 300%;
+      background: linear-gradient(90deg, #ffffff 0%, #a0a5b5 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: gradientPink 4s ease infinite;
-      filter: drop-shadow(0 0 25px rgba(255, 0, 127, 0.6));
-    }
-
-    @keyframes gradientPink {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
     }
 
     header p {
-      color: #6c757d;
-      font-size: 0.95rem;
-      letter-spacing: 3px;
+      color: #5c6470;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      font-weight: 700;
+      margin-top: 4px;
+      font-weight: 600;
     }
 
-    /* GRID KART */
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 30px;
-      width: 100%;
-      perspective: 1000px; /* Dla efektu 3D */
-    }
-
-    /* KARTA 3D */
-    .card {
-      background: rgba(10, 14, 18, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 20px;
-      padding: 35px 25px 30px 25px;
+    /* LISTA PANELOWA (HUD LIST) */
+    .hack-list {
       display: flex;
       flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .hack-item {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 28px;
+      display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 350px;
       text-decoration: none;
       position: relative;
       overflow: hidden;
-      transform-style: preserve-3d;
-      transition: transform 0.15s ease-out, border-color 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      cursor: pointer;
     }
 
-    /* Światło wewnątrz karty podążające za myszką */
+    /* Pasek po lewej stronie przy hover */
+    .hack-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity 0.3s ease, width 0.3s ease;
+      box-shadow: 0 0 15px currentColor;
+    }
+
+    .hack-item-left {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      z-index: 2;
+    }
+
+    /* Ikona z tłem */
+    .icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .icon-box svg {
+      width: 26px;
+      height: 26px;
+      fill: currentColor;
+      transition: transform 0.3s ease;
+    }
+
+    /* Informacje o Hacku */
+    .hack-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .hack-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #fff;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .hack-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .diff-pill {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hack-sub {
+      font-size: 0.75rem;
+      color: #5c6470;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* Prawa strona - Przycisk / Strzałka */
+    .hack-item-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 2;
+    }
+
+    .action-btn {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .arrow-icon {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      transition: transform 0.3s ease;
+    }
+
+    /* Efekt podświetlenia myszki pod podłogą kafelka */
     .card-glow {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      border-radius: 20px;
-      background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
+      background: radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.04), transparent 40%);
       pointer-events: none;
       z-index: 1;
     }
 
-    /* Ikona */
-    .card-icon {
-      width: 55px;
-      height: 55px;
-      z-index: 2;
-      transform: translateZ(30px);
-      transition: transform 0.3s ease;
+    /* HOVER STATES */
+    .hack-item:hover {
+      transform: translateX(8px);
+      background: rgba(16, 22, 30, 0.85);
+      border-color: rgba(255, 255, 255, 0.15);
     }
 
-    .card-icon svg {
-      width: 100%;
-      height: 100%;
-      fill: currentColor;
+    .hack-item:hover::before {
+      opacity: 1;
+      width: 6px;
     }
 
-    /* Tytuł */
-    .card-title {
-      font-size: 1.6rem;
-      font-weight: 800;
-      letter-spacing: 1px;
-      z-index: 2;
-      transform: translateZ(25px);
-      transition: text-shadow 0.3s ease;
+    .hack-item:hover .icon-box {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
     }
 
-    /* Stopka */
-    .card-footer {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-      z-index: 2;
-      transform: translateZ(20px);
+    .hack-item:hover .icon-box svg {
+      transform: scale(1.15);
     }
 
-    .line {
-      height: 2px;
-      width: 35%;
-      border-radius: 2px;
-      transition: all 0.4s ease;
+    .hack-item:hover .action-btn {
+      color: #fff;
     }
 
-    .btn-text {
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      opacity: 0.6;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .hack-item:hover .arrow-icon {
+      transform: translateX(5px);
     }
-
-    .btn-text span { transition: transform 0.3s ease; }
-
-    /* Hover ogólny */
-    .card:hover .line { width: 100%; }
-    .card:hover .btn-text { opacity: 1; letter-spacing: 3px; }
-    .card:hover .btn-text span { transform: translateX(5px); }
 
     /* ========================================================= */
-    /* --- KOLORYSTYKA I NEON DLA KAŻDEGO HACKA --- */
+    /* --- SYSTEM DEDYKOWANYCH KOLORÓW NEONOWYCH --- */
     /* ========================================================= */
 
     /* Cyan (Lights Out) */
-    .card-cyan { color: #00f0ff; }
-    .card-cyan .line { background: #00f0ff; box-shadow: 0 0 10px #00f0ff; }
-    .card-cyan:hover {
-      border-color: rgba(0, 240, 255, 0.4);
-      box-shadow: 0 20px 40px rgba(0, 240, 255, 0.25);
-    }
-    .card-cyan:hover .card-title { text-shadow: 0 0 20px rgba(0, 240, 255, 0.9); }
+    .color-cyan { color: #00f0ff; }
+    .color-cyan .diff-pill { color: #00f0ff; border-color: rgba(0, 240, 255, 0.3); background: rgba(0, 240, 255, 0.08); }
+    .color-cyan:hover { box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15); }
+    .color-cyan:hover .hack-title { color: #00f0ff; text-shadow: 0 0 12px rgba(0, 240, 255, 0.6); }
 
     /* Yellow (Alarm) */
-    .card-yellow { color: #ffe600; }
-    .card-yellow .line { background: #ffe600; box-shadow: 0 0 10px #ffe600; }
-    .card-yellow:hover {
-      border-color: rgba(255, 230, 0, 0.4);
-      box-shadow: 0 20px 40px rgba(255, 230, 0, 0.25);
-    }
-    .card-yellow:hover .card-title { text-shadow: 0 0 20px rgba(255, 230, 0, 0.9); }
+    .color-yellow { color: #ffe600; }
+    .color-yellow .diff-pill { color: #ffe600; border-color: rgba(255, 230, 0, 0.3); background: rgba(255, 230, 0, 0.08); }
+    .color-yellow:hover { box-shadow: 0 10px 30px rgba(255, 230, 0, 0.15); }
+    .color-yellow:hover .hack-title { color: #ffe600; text-shadow: 0 0 12px rgba(255, 230, 0, 0.6); }
 
     /* Pink (Ammunation) */
-    .card-pink { color: #ff007f; }
-    .card-pink .line { background: #ff007f; box-shadow: 0 0 10px #ff007f; }
-    .card-pink:hover {
-      border-color: rgba(255, 0, 127, 0.4);
-      box-shadow: 0 20px 40px rgba(255, 0, 127, 0.25);
-    }
-    .card-pink:hover .card-title { text-shadow: 0 0 20px rgba(255, 0, 127, 0.9); }
+    .color-pink { color: #ff007f; }
+    .color-pink .diff-pill { color: #ff007f; border-color: rgba(255, 0, 127, 0.3); background: rgba(255, 0, 127, 0.08); }
+    .color-pink:hover { box-shadow: 0 10px 30px rgba(255, 0, 127, 0.15); }
+    .color-pink:hover .hack-title { color: #ff007f; text-shadow: 0 0 12px rgba(255, 0, 127, 0.6); }
 
     /* Red (Jacht) */
-    .card-red { color: #ff3355; }
-    .card-red .line { background: #ff3355; box-shadow: 0 0 10px #ff3355; }
-    .card-red:hover {
-      border-color: rgba(255, 51, 85, 0.4);
-      box-shadow: 0 20px 40px rgba(255, 51, 85, 0.25);
-    }
-    .card-red:hover .card-title { text-shadow: 0 0 20px rgba(255, 51, 85, 0.9); }
+    .color-red { color: #ff3355; }
+    .color-red .diff-pill { color: #ff3355; border-color: rgba(255, 51, 85, 0.3); background: rgba(255, 51, 85, 0.08); }
+    .color-red:hover { box-shadow: 0 10px 30px rgba(255, 51, 85, 0.15); }
+    .color-red:hover .hack-title { color: #ff3355; text-shadow: 0 0 12px rgba(255, 51, 85, 0.6); }
 
     /* Green (Fleeca) */
-    .card-green { color: #00ff66; }
-    .card-green .line { background: #00ff66; box-shadow: 0 0 10px #00ff66; }
-    .card-green:hover {
-      border-color: rgba(0, 255, 102, 0.4);
-      box-shadow: 0 20px 40px rgba(0, 255, 102, 0.25);
-    }
-    .card-green:hover .card-title { text-shadow: 0 0 20px rgba(0, 255, 102, 0.9); }
+    .color-green { color: #00ff66; }
+    .color-green .diff-pill { color: #00ff66; border-color: rgba(0, 255, 102, 0.3); background: rgba(0, 255, 102, 0.08); }
+    .color-green:hover { box-shadow: 0 10px 30px rgba(0, 255, 102, 0.15); }
+    .color-green:hover .hack-title { color: #00ff66; text-shadow: 0 0 12px rgba(0, 255, 102, 0.6); }
 
     @media (max-width: 600px) {
-      header h1 { font-size: 2.2rem; }
-      .grid-container { grid-template-columns: 1fr; }
+      header h1 { font-size: 2rem; }
+      .hack-item { padding: 16px 20px; }
+      .icon-box { width: 44px; height: 44px; }
+      .hack-title { font-size: 1.1rem; }
+      .action-btn span { display: none; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Animowane Tło Cyfrowe -->
   <canvas id="bgCanvas"></canvas>
 
-  <div class="wrapper">
+  <div class="app-container">
+    
     <header>
-      <h1>Wybierz Hacka</h1>
-      <p>Systemy Treningowe ONBEAT.GG</p>
+      <div class="status-badge">
+        <div class="status-dot"></div> SYSTEM ONLINE
+      </div>
+      <h1>ONBEAT.GG HACKS</h1>
+      <p>WYBIERZ MODUŁ TRENINGOWY</p>
     </header>
 
-    <div class="grid-container">
+    <div class="hack-list">
 
       <!-- 1. Lights Out -->
-      <a href="lightsout/index.html" class="card card-cyan">
+      <a href="lightsout/index.html" class="hack-item color-cyan">
         <div class="card-glow"></div>
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <div class="hack-item-left">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          </div>
+          <div class="hack-details">
+            <div class="hack-title">LIGHTS OUT</div>
+            <div class="hack-meta">
+              <span class="diff-pill">MEDIUM</span>
+              <span class="hack-sub">Matryca Przełączników</span>
+            </div>
+          </div>
         </div>
-        <div class="card-title">LIGHTS OUT</div>
-        <div class="card-footer">
-          <div class="line"></div>
-          <div class="btn-text">Uruchom <span>➔</span></div>
+        <div class="hack-item-right">
+          <div class="action-btn">
+            <span>START</span>
+            <svg class="arrow-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
         </div>
       </a>
 
       <!-- 2. Alarm -->
-      <a href="alarm/index.html" class="card card-yellow">
+      <a href="alarm/index.html" class="hack-item color-yellow">
         <div class="card-glow"></div>
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        <div class="hack-item-left">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+          </div>
+          <div class="hack-details">
+            <div class="hack-title">ALARM</div>
+            <div class="hack-meta">
+              <span class="diff-pill">EASY</span>
+              <span class="hack-sub">Pamięć Sekwencji Kodowej</span>
+            </div>
+          </div>
         </div>
-        <div class="card-title">ALARM</div>
-        <div class="card-footer">
-          <div class="line"></div>
-          <div class="btn-text">Uruchom <span>➔</span></div>
+        <div class="hack-item-right">
+          <div class="action-btn">
+            <span>START</span>
+            <svg class="arrow-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
         </div>
       </a>
 
       <!-- 3. Ammunation -->
-      <a href="ammunation/index.html" class="card card-pink">
+      <a href="ammunation/index.html" class="hack-item color-pink">
         <div class="card-glow"></div>
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+        <div class="hack-item-left">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+          </div>
+          <div class="hack-details">
+            <div class="hack-title">AMMUNATION</div>
+            <div class="hack-meta">
+              <span class="diff-pill">HARD</span>
+              <span class="hack-sub">Szybki Refleks i Reakcja</span>
+            </div>
+          </div>
         </div>
-        <div class="card-title">AMMUNATION</div>
-        <div class="card-footer">
-          <div class="line"></div>
-          <div class="btn-text">Uruchom <span>➔</span></div>
+        <div class="hack-item-right">
+          <div class="action-btn">
+            <span>START</span>
+            <svg class="arrow-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
         </div>
       </a>
 
       <!-- 4. Jacht -->
-      <a href="jacht/index.html" class="card card-red">
+      <a href="jacht/index.html" class="hack-item color-red">
         <div class="card-glow"></div>
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68c.08-.26.06-.54-.06-.78s-.34-.42-.6-.5L12 6.08 2.72 9.04c-.26.08-.47.26-.6.5s-.14.52-.06.78L3.95 19z"/></svg>
+        <div class="hack-item-left">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68c.08-.26.06-.54-.06-.78s-.34-.42-.6-.5L12 6.08 2.72 9.04c-.26.08-.47.26-.6.5s-.14.52-.06.78L3.95 19z"/></svg>
+          </div>
+          <div class="hack-details">
+            <div class="hack-title">JACHT</div>
+            <div class="hack-meta">
+              <span class="diff-pill">HARD</span>
+              <span class="hack-sub">Zaawansowany Obywatel</span>
+            </div>
+          </div>
         </div>
-        <div class="card-title">JACHT</div>
-        <div class="card-footer">
-          <div class="line"></div>
-          <div class="btn-text">Uruchom <span>➔</span></div>
+        <div class="hack-item-right">
+          <div class="action-btn">
+            <span>START</span>
+            <svg class="arrow-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
         </div>
       </a>
 
       <!-- 5. Fleeca -->
-      <a href="fleeca/index.html" class="card card-green">
+      <a href="fleeca/index.html" class="hack-item color-green">
         <div class="card-glow"></div>
-        <div class="card-icon">
-          <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3 3.1-3 1.71 0 3.1 1.29 3.1 3v2z"/></svg>
+        <div class="hack-item-left">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3 3.1-3 1.71 0 3.1 1.29 3.1 3v2z"/></svg>
+          </div>
+          <div class="hack-details">
+            <div class="hack-title">FLEECA</div>
+            <div class="hack-meta">
+              <span class="diff-pill">MEDIUM</span>
+              <span class="hack-sub">Złamanie Zabezpieczeń Banku</span>
+            </div>
+          </div>
         </div>
-        <div class="card-title">FLEECA</div>
-        <div class="card-footer">
-          <div class="line"></div>
-          <div class="btn-text">Uruchom <span>➔</span></div>
+        <div class="hack-item-right">
+          <div class="action-btn">
+            <span>START</span>
+            <svg class="arrow-icon" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
         </div>
       </a>
 
@@ -317,37 +454,23 @@
   </div>
 
   <script>
-    // --- EFEKT 3D TILT & LIGHT GLOW NA KARTACH ---
-    const cards = document.querySelectorAll('.card');
+    // Podświetlenie pozycji pod kursorem myszy
+    const items = document.querySelectorAll('.hack-item');
 
-    cards.forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
+    items.forEach(item => {
+      item.addEventListener('mousemove', e => {
+        const rect = item.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // Ustawienie punktu światła
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
-
-        // Obliczenie kąta pochylenia 3D
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -12;
-        const rotateY = ((x - centerX) / centerX) * 12;
-
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
-      });
-
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        item.style.setProperty('--mouse-x', `${x}px`);
+        item.style.setProperty('--mouse-y', `${y}px`);
       });
     });
 
-    // --- ANIMACJA TŁA (DYNAMICZNE CZĄSTECZKI) ---
+    // Cyberpunkowy Grid + Cząsteczki w Tle (Canvas)
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
-    let particles = [];
 
     function resize() {
       canvas.width = window.innerWidth;
@@ -356,37 +479,34 @@
     window.addEventListener('resize', resize);
     resize();
 
-    class Particle {
-      constructor() { this.reset(); }
-      reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 0.5;
-        this.speedX = (Math.random() - 0.5) * 0.3;
-        this.speedY = (Math.random() - 0.5) * 0.3;
-        this.opacity = Math.random() * 0.4 + 0.1;
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
-      }
-      draw() {
-        ctx.fillStyle = `rgba(255, 0, 127, ${this.opacity})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
+    let gridOffset = 0;
 
-    for (let i = 0; i < 50; i++) particles.push(new Particle());
-
-    function animate() {
+    function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => { p.update(); p.draw(); });
-      requestAnimationFrame(animate);
+
+      // Siatka cyfrowa w tle
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+      ctx.lineWidth = 1;
+
+      const gridSize = 40;
+      for (let x = 0; x < canvas.width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y < canvas.height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      requestAnimationFrame(draw);
     }
-    animate();
+
+    draw();
   </script>
 
 </body>
