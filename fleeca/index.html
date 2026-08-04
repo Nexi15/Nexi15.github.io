@@ -157,6 +157,18 @@
       max-width: 440px;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 0, 127, 0.1);
       position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .game-card-2.alarm-active {
+      border-color: #ff3366;
+      box-shadow: 0 0 40px rgba(255, 51, 102, 0.6);
+      animation: pulseAlarm 0.6s infinite alternate;
+    }
+
+    @keyframes pulseAlarm {
+      from { background-color: #0f0e17; }
+      to { background-color: #2a0813; }
     }
 
     .card-header-2 {
@@ -194,6 +206,10 @@
       font-weight: 700;
       color: #a0a0b0;
       margin-bottom: 15px;
+    }
+
+    .errors-tag {
+      color: #ff3366;
     }
 
     .grid-2 {
@@ -239,8 +255,13 @@
     }
 
     .cell-2.wrong {
-      background: rgba(255, 51, 102, 0.4);
-      border-color: #ff3366;
+      background: rgba(255, 51, 102, 0.5) !important;
+      border-color: #ff3366 !important;
+      box-shadow: 0 0 10px rgba(255, 51, 102, 0.8) !important;
+    }
+
+    .cell-2.disabled {
+      pointer-events: none;
     }
 
     /* Wspólne przyciski */
@@ -346,7 +367,7 @@
 
   <!-- ================= POZIOM 2: MINY (PAMIĘĆ) ================= -->
   <div id="level2" class="level-container">
-    <div class="game-card-2">
+    <div class="game-card-2" id="card2">
       <div class="card-header-2">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="#ff007f">
           <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
@@ -361,7 +382,9 @@
       <div class="status-bar-2">
         <span id="statusText2" style="color: #ff007f;">ZAPAMIĘTAJ MINY</span>
         <div>
-          <span id="minesCounter2">0/8</span> | <span id="stageCounter2">0/2</span>
+          <span id="minesCounter2">0/8</span> | 
+          <span id="errorsCounter2" class="errors-tag">Błędy: 0/2</span> | 
+          <span id="stageCounter2">0/2</span>
         </div>
       </div>
 
@@ -530,8 +553,9 @@
     /* ========================================================= */
     /* --- LOGIKA POZIOMU 2: ZAPAMIĘTYWANIE MIN --- */
     /* ========================================================= */
-    const GRID_SIZE = 8, TOTAL_MINES = 8, MEMORY_TIME = 10.0, TARGET_STAGES = 2;
-    let mines2 = [], selectedMines2 = [], currentStage2 = 0, isMemoryPhase2 = false, timerInterval2 = null;
+    const GRID_SIZE = 8, TOTAL_MINES = 8, MEMORY_TIME = 10.0, TARGET_STAGES = 2, MAX_ERRORS = 2;
+    let mines2 = [], selectedMines2 = [], wrongSelections2 = [], currentStage2 = 0, errorsCount2 = 0;
+    let isMemoryPhase2 = false, timerInterval2 = null, isGameOver2 = false;
 
     function createGrid2() {
       const gridEl = document.getElementById('grid2');
@@ -546,14 +570,21 @@
 
     function initLevel2() {
       currentStage2 = 0;
+      errorsCount2 = 0;
+      isGameOver2 = false;
+      document.getElementById('card2').classList.remove('alarm-active');
       document.getElementById('resultOverlay2').style.display = 'none';
       createGrid2();
       startMemoryPhase2();
     }
 
     function startMemoryPhase2() {
-      isMemoryPhase2 = true; selectedMines2 = [];
+      if (isGameOver2) return;
+      isMemoryPhase2 = true; 
+      selectedMines2 = [];
+      wrongSelections2 = [];
       mines2 = [];
+      
       while (mines2.length < TOTAL_MINES) {
         let r = Math.floor(Math.random() * 64);
         if (!mines2.includes(r)) mines2.push(r);
@@ -561,10 +592,14 @@
 
       document.getElementById('statusText2').innerText = "ZAPAMIĘTAJ MINY";
       document.getElementById('minesCounter2').innerText = `0/${TOTAL_MINES}`;
+      document.getElementById('errorsCounter2').innerText = `Błędy: ${errorsCount2}/${MAX_ERRORS}`;
       document.getElementById('stageCounter2').innerText = `${currentStage2}/${TARGET_STAGES}`;
 
       const cells = document.querySelectorAll('.cell-2');
-      cells.forEach((c, i) => { c.className = 'cell-2'; if (mines2.includes(i)) c.classList.add('has-mine'); });
+      cells.forEach((c, i) => { 
+        c.className = 'cell-2'; 
+        if (mines2.includes(i)) c.classList.add('has-mine'); 
+      });
 
       let start = Date.now();
       clearInterval(timerInterval2);
@@ -583,37 +618,62 @@
     }
 
     function handleCellClick2(idx) {
-      if (isMemoryPhase2) return;
+      if (isMemoryPhase2 || isGameOver2) return;
+      
       const cells = document.querySelectorAll('.cell-2');
-      if (selectedMines2.includes(idx)) {
-        selectedMines2 = selectedMines2.filter(i => i !== idx);
-        cells[idx].classList.remove('has-mine');
-      } else {
-        if (selectedMines2.length >= TOTAL_MINES) return;
+      
+      // Jeżeli kliknięto już wybrane poprawne pole lub błędne pole
+      if (selectedMines2.includes(idx) || wrongSelections2.includes(idx)) return;
+
+      // Sprawdzamy czy to kafel z miną
+      if (mines2.includes(idx)) {
         selectedMines2.push(idx);
         cells[idx].classList.add('has-mine');
+        document.getElementById('minesCounter2').innerText = `${selectedMines2.length}/${TOTAL_MINES}`;
+
+        // Wygrana danej rundy/etapu po zebraniu wszystkich 8 min
+        if (selectedMines2.length === TOTAL_MINES) {
+          currentStage2++;
+          if (currentStage2 >= TARGET_STAGES) {
+            endGame2(true, "SYSTEM ZAKOŃCZONY SUKCESEM!");
+          } else {
+            setTimeout(startMemoryPhase2, 800);
+          }
+        }
+      } else {
+        // Błędne kliknięcie (brak miny)
+        wrongSelections2.push(idx);
+        cells[idx].classList.add('wrong');
+        errorsCount2++;
+        document.getElementById('errorsCounter2').innerText = `Błędy: ${errorsCount2}/${MAX_ERRORS}`;
+
+        // Aktywacja alarmu po popełnieniu 2 błędów
+        if (errorsCount2 >= MAX_ERRORS) {
+          triggerAlarm2();
+        }
       }
-      document.getElementById('minesCounter2').innerText = `${selectedMines2.length}/${TOTAL_MINES}`;
-      if (selectedMines2.length === TOTAL_MINES) verify2();
     }
 
-    function verify2() {
-      let isCorrect = selectedMines2.every(m => mines2.includes(m));
+    function triggerAlarm2() {
+      isGameOver2 = true;
+      clearInterval(timerInterval2);
+      document.getElementById('card2').classList.add('alarm-active');
+      
+      // Pokazujemy wszystkie miny na planszy po przegranej
       const cells = document.querySelectorAll('.cell-2');
-      if (!isCorrect) {
-        selectedMines2.forEach(idx => { if (!mines2.includes(idx)) cells[idx].classList.add('wrong'); });
-      }
+      mines2.forEach(mIdx => {
+        if (!selectedMines2.includes(mIdx)) {
+          cells[mIdx].classList.add('has-mine');
+        }
+      });
 
-      if (isCorrect) {
-        currentStage2++;
-        if (currentStage2 >= TARGET_STAGES) endGame2(true, "SYSTEM ZAKOŃCZONY SUKCESEM!");
-        else setTimeout(startMemoryPhase2, 1000);
-      } else {
-        setTimeout(() => endGame2(false, "BŁĘDNE POŁOŻENIE MIN!"), 1000);
-      }
+      setTimeout(() => {
+        endGame2(false, "🚨 URUCHOMIONO ALARM BANKOWY! MAX BŁĘDÓW (2/2)");
+      }, 800);
     }
 
     function endGame2(win, msg) {
+      isGameOver2 = true;
       clearInterval(timerInterval2);
       const overlay = document.getElementById('resultOverlay2');
       overlay.style.display = 'flex';
