@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fleeca Bank - System Hakerski (Levels 1-3)</title>
+  <title>Fleeca Bank - System Hakerski</title>
   <style>
     :root {
       --bg-main: #070913;
@@ -385,7 +385,7 @@
   <div class="app-header">
     <div class="app-title">⚡ Fleeca Bank Systems ⚡</div>
     <div class="level-tabs">
-      <button class="tab-btn active" id="tab-lvl1" onclick="switchLevel(1)">1: ROZPLĄTYWANIE</button>
+      <button class="tab-btn active" id="tab-lvl1" onclick="switchLevel(1)">1: ROZPLĄTYWANIE (15 KÓŁEK)</button>
       <button class="tab-btn tab-pink" id="tab-lvl2" onclick="switchLevel(2)">2: MINY</button>
       <button class="tab-btn tab-green" id="tab-lvl3" onclick="switchLevel(3)">3: ŚCIEŻKA</button>
     </div>
@@ -394,7 +394,7 @@
   <div id="level1" class="level-container active">
     <div class="card">
       <div class="card-header" style="color: var(--accent-cyan);">
-        <span>🔷 Węzły Sieci</span>
+        <span>🔷 Węzły Sieci (15 Kółek)</span>
         <span style="font-size: 0.85rem; color: var(--text-muted);">Przecięcia: <b id="crossings" style="color:var(--accent-red)">0</b></span>
       </div>
 
@@ -406,10 +406,9 @@
 
       <div class="settings-panel">
         <div style="display: flex; gap: 8px; align-items: center;">
-          <span style="font-size: 0.75rem; color: var(--text-muted);">Poziom:</span>
-          <button class="diff-btn active" id="btn-easy" onclick="setPreset1(5, 'btn-easy')">EASY (5)</button>
-          <button class="diff-btn" id="btn-med" onclick="setPreset1(8, 'btn-med')">MED (8)</button>
-          <button class="diff-btn" id="btn-hard" onclick="setPreset1(12, 'btn-hard')">HARD (12)</button>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Tryb:</span>
+          <button class="diff-btn active" id="btn-fleeca" onclick="setPreset1(15, 'btn-fleeca')">FLEECA (15 KÓŁEK)</button>
+          <button class="diff-btn" id="btn-easy" onclick="setPreset1(8, 'btn-easy')">EASY (8)</button>
         </div>
       </div>
 
@@ -508,11 +507,11 @@
     }
 
     /* ========================================================= */
-    /* LOGIKA POZIOM 1: ROZPLĄTYWANIE                            */
+    /* LOGIKA POZIOM 1: ROZPLĄTYWANIE (DOMYŚLNIE 15 KÓŁEK)        */
     /* ========================================================= */
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    let nodeCount1 = 5;
+    let nodeCount1 = 15; // Domyślnie 15 kółek
     const NODE_RADIUS = 10;
     let nodes1 = [], edges1 = [], draggedNode1 = null;
     let timeLeft1 = 60.0, timerInterval1 = null, gameOver1 = false;
@@ -612,240 +611,4 @@
       });
 
       if (crossings === 0 && !gameOver1) {
-        endGame1(true, "🔓 SIEC ROZPLĄTANA!");
-      }
-    }
-
-    function endGame1(win, msg) {
-      gameOver1 = true;
-      clearInterval(timerInterval1);
-      const overlay = document.getElementById('resultOverlay1');
-      overlay.style.display = 'flex';
-      const title = document.getElementById('resultTitle1');
-      title.innerText = win ? "SUKCES" : "PORAŻKA";
-      title.style.color = win ? "#00ff88" : "#ff3366";
-      document.getElementById('resultSub1').innerText = msg;
-    }
-
-    /* ========================================================= */
-    /* LOGIKA POZIOM 2: MINY                                     */
-    /* ========================================================= */
-    const GRID_SIZE = 8, TOTAL_MINES = 8, MEMORY_TIME = 8.0, TARGET_STAGES_2 = 2, MAX_ERRORS = 2;
-    let mines2 = [], selectedMines2 = [], wrongSelections2 = [], currentStage2 = 0, errorsCount2 = 0;
-    let isMemoryPhase2 = false, timerInterval2 = null, isGameOver2 = false;
-
-    function createGrid2() {
-      const gridEl = document.getElementById('grid2');
-      gridEl.innerHTML = '';
-      for (let i = 0; i < 64; i++) {
-        const cell = document.createElement('div');
-        cell.classList.add('cell-2');
-        cell.addEventListener('click', () => handleCellClick2(i));
-        gridEl.appendChild(cell);
-      }
-    }
-
-    function initLevel2() {
-      currentStage2 = 0; errorsCount2 = 0; isGameOver2 = false;
-      document.getElementById('resultOverlay2').style.display = 'none';
-      createGrid2();
-      startMemoryPhase2();
-    }
-
-    function startMemoryPhase2() {
-      if (isGameOver2) return;
-      isMemoryPhase2 = true; selectedMines2 = []; wrongSelections2 = []; mines2 = [];
-      
-      while (mines2.length < TOTAL_MINES) {
-        let r = Math.floor(Math.random() * 64);
-        if (!mines2.includes(r)) mines2.push(r);
-      }
-
-      document.getElementById('statusText2').innerText = "ZAPAMIĘTAJ MINY";
-      document.getElementById('minesCounter2').innerText = `0/${TOTAL_MINES}`;
-      document.getElementById('errorsCounter2').innerText = `Błędy: ${errorsCount2}/${MAX_ERRORS}`;
-      document.getElementById('stageCounter2').innerText = `Runda ${currentStage2}/${TARGET_STAGES_2}`;
-
-      const cells = document.querySelectorAll('.cell-2');
-      cells.forEach((c, i) => {
-        c.className = 'cell-2';
-        if (mines2.includes(i)) c.classList.add('has-mine');
-      });
-
-      let start = Date.now();
-      clearInterval(timerInterval2);
-      timerInterval2 = setInterval(() => {
-        let elapsed = (Date.now() - start) / 1000;
-        let rem = Math.max(0, MEMORY_TIME - elapsed);
-        document.getElementById('progressFill2').style.width = `${(rem / MEMORY_TIME) * 100}%`;
-        if (rem <= 0) { clearInterval(timerInterval2); startSelectionPhase2(); }
-      }, 50);
-    }
-
-    function startSelectionPhase2() {
-      isMemoryPhase2 = false;
-      document.getElementById('statusText2').innerText = "ZAZNACZ MINY";
-      document.querySelectorAll('.cell-2').forEach(c => c.className = 'cell-2');
-    }
-
-    function handleCellClick2(idx) {
-      if (isMemoryPhase2 || isGameOver2) return;
-      const cells = document.querySelectorAll('.cell-2');
-      if (selectedMines2.includes(idx) || wrongSelections2.includes(idx)) return;
-
-      if (mines2.includes(idx)) {
-        selectedMines2.push(idx);
-        cells[idx].classList.add('has-mine');
-        document.getElementById('minesCounter2').innerText = `${selectedMines2.length}/${TOTAL_MINES}`;
-
-        if (selectedMines2.length === TOTAL_MINES) {
-          currentStage2++;
-          if (currentStage2 >= TARGET_STAGES_2) endGame2(true, "SYSTEM ZAKOŃCZONY SUKCESEM!");
-          else setTimeout(startMemoryPhase2, 600);
-        }
-      } else {
-        wrongSelections2.push(idx);
-        cells[idx].classList.add('wrong');
-        errorsCount2++;
-        document.getElementById('errorsCounter2').innerText = `Błędy: ${errorsCount2}/${MAX_ERRORS}`;
-        if (errorsCount2 >= MAX_ERRORS) endGame2(false, "🚨 URUCHOMIONO ALARM!");
-      }
-    }
-
-    function endGame2(win, msg) {
-      isGameOver2 = true;
-      clearInterval(timerInterval2);
-      const overlay = document.getElementById('resultOverlay2');
-      overlay.style.display = 'flex';
-      const title = document.getElementById('resultTitle2');
-      title.innerText = win ? "SUKCES" : "PORAŻKA";
-      title.style.color = win ? "#00ff88" : "#ff3366";
-      document.getElementById('resultSub2').innerText = msg;
-    }
-
-    /* ========================================================= */
-    /* LOGIKA POZIOM 3: ŚCIEŻKA                                  */
-    /* ========================================================= */
-    const TOTAL_NODES_3 = 16, TARGET_STAGES_3 = 2, STAGE_TIME_3 = 15.0;
-    let currentStage3 = 0, nextExpectedNumber3 = 1, nodePositions3 = [], clickedSequence3 = [];
-    let isGameOver3 = false, timerInterval3 = null;
-
-    function initLevel3() {
-      currentStage3 = 0;
-      isGameOver3 = false;
-      document.getElementById('resultOverlay3').style.display = 'none';
-      startStage3();
-    }
-
-    function startStage3() {
-      nextExpectedNumber3 = 1; clickedSequence3 = []; nodePositions3 = [];
-      document.getElementById('nextTargetText3').innerText = `DALEJ: 1`;
-      document.getElementById('progressText3').innerText = `0/${TOTAL_NODES_3}`;
-      document.getElementById('stageText3').innerText = `ETAP: ${currentStage3}/${TARGET_STAGES_3}`;
-
-      clearBoard3();
-      generateNodes3();
-      startTimer3();
-    }
-
-    function clearBoard3() {
-      const board = document.getElementById('board3');
-      const svg = document.getElementById('svgLines3');
-      document.querySelectorAll('.node-3').forEach(n => n.remove());
-      svg.innerHTML = '';
-    }
-
-    function generateNodes3() {
-      const board = document.getElementById('board3');
-      const boardW = board.clientWidth || 470;
-      const boardH = board.clientHeight || 350;
-      const padding = 35;
-
-      for (let i = 1; i <= TOTAL_NODES_3; i++) {
-        let validPos = false, posX, posY, attempts = 0;
-        while (!validPos && attempts < 200) {
-          attempts++;
-          posX = Math.floor(padding + Math.random() * (boardW - padding * 2));
-          posY = Math.floor(padding + Math.random() * (boardH - padding * 2));
-          validPos = nodePositions3.every(pos => Math.hypot(pos.x - posX, pos.y - posY) >= 42);
-        }
-
-        nodePositions3.push({ num: i, x: posX, y: posY });
-
-        const nodeEl = document.createElement('div');
-        nodeEl.classList.add('node-3');
-        nodeEl.innerText = i;
-        nodeEl.style.left = `${posX}px`;
-        nodeEl.style.top = `${posY}px`;
-
-        nodeEl.addEventListener('click', () => handleNodeClick3(i, posX, posY, nodeEl));
-        board.appendChild(nodeEl);
-      }
-    }
-
-    function startTimer3() {
-      clearInterval(timerInterval3);
-      let startTime = Date.now();
-
-      timerInterval3 = setInterval(() => {
-        if (isGameOver3) return;
-        let elapsed = (Date.now() - startTime) / 1000;
-        let rem = Math.max(0, STAGE_TIME_3 - elapsed);
-        document.getElementById('progressFill3').style.width = `${(rem / STAGE_TIME_3) * 100}%`;
-
-        if (rem <= 0) endGame3(false, "💥 CZAS UPŁYNĄŁ!");
-      }, 50);
-    }
-
-    function handleNodeClick3(num, x, y, el) {
-      if (isGameOver3) return;
-
-      if (num === nextExpectedNumber3) {
-        el.classList.add('active');
-        if (clickedSequence3.length > 0) {
-          let lastPos = clickedSequence3[clickedSequence3.length - 1];
-          drawLine3(lastPos.x, lastPos.y, x, y);
-        }
-
-        clickedSequence3.push({ num, x, y });
-        document.getElementById('progressText3').innerText = `${num}/${TOTAL_NODES_3}`;
-        nextExpectedNumber3++;
-
-        if (nextExpectedNumber3 <= TOTAL_NODES_3) {
-          document.getElementById('nextTargetText3').innerText = `DALEJ: ${nextExpectedNumber3}`;
-        } else {
-          currentStage3++;
-          if (currentStage3 >= TARGET_STAGES_3) endGame3(true, "🔓 FLEECA ROZPRACOWANA!");
-          else setTimeout(startStage3, 500);
-        }
-      } else {
-        el.classList.add('wrong');
-        endGame3(false, "💥 ZŁA KOLEJNOŚĆ!");
-      }
-    }
-
-    function drawLine3(x1, y1, x2, y2) {
-      const svg = document.getElementById('svgLines3');
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.classList.add('node-line');
-      line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-      line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-      svg.appendChild(line);
-    }
-
-    function endGame3(win, msg) {
-      isGameOver3 = true;
-      clearInterval(timerInterval3);
-      const overlay = document.getElementById('resultOverlay3');
-      overlay.style.display = 'flex';
-      const title = document.getElementById('resultTitle3');
-      title.innerText = win ? "SUKCES" : "PORAŻKA";
-      title.style.color = win ? "#00ff88" : "#ff3366";
-      document.getElementById('resultSub3').innerText = msg;
-    }
-
-    // Domyślny start gry
-    initLevel1();
-  </script>
-</body>
-</html>
+        endGame1(true, "🔓 SIEC ROZPL
