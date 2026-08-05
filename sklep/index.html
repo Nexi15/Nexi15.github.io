@@ -179,4 +179,325 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      width:
+      width: 250px;
+    }
+
+    .num-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.4rem;
+      padding: 14px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .num-btn:hover {
+      border-color: var(--green-hack);
+      color: var(--green-hack);
+      background: rgba(0, 255, 102, 0.1);
+      box-shadow: 0 0 10px var(--green-glow);
+    }
+
+    .num-btn:active {
+      background: var(--green-hack);
+      color: #000;
+    }
+
+    /* KONTROLA & REZULTAT */
+    .action-bar {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn-reset {
+      font-family: 'Share Tech Mono', monospace;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--border-cyan);
+      color: var(--border-cyan);
+      padding: 10px 24px;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+      background: var(--border-cyan);
+      color: #000;
+      box-shadow: 0 0 15px var(--glow-cyan);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 12, 16, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      z-index: 10;
+      border-radius: 8px;
+    }
+
+    .overlay-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .overlay-sub {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="hack-frame">
+    <div class="header-bar">
+      <span class="system-title">SYSTEM STORE HACK</span>
+      <span id="stageBadge" class="stage-text">ETAP 1 / 2</span>
+    </div>
+
+    <div class="timer-container">
+      <div id="timerBar" class="timer-fill"></div>
+    </div>
+
+    <div id="level1View">
+      <div class="grid-4x4" id="boardGrid"></div>
+    </div>
+
+    <div id="level2View" class="hidden">
+      <div class="pad-container">
+        <div class="pad-status" id="padStatus">ZAPAMIĘTAJ KOLEJNOŚĆ</div>
+        <div class="display-screen" id="numDisplay">---</div>
+        <div class="num-pad" id="keypad"></div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn-reset" onclick="initLevel1()">RESTART HACK</button>
+    </div>
+
+    <div id="resultOverlay" class="overlay hidden">
+      <div id="resTitle" class="overlay-title"></div>
+      <div id="resSub" class="overlay-sub"></div>
+      <button class="btn-reset" onclick="initLevel1()">SPRÓBUJ PONOWNIE</button>
+    </div>
+  </div>
+
+  <script>
+    let currentLevel = 1;
+    let timerInterval = null;
+    let timeLeft = 0;
+
+    const TIME_LVL1 = 90; // Czas na ułożenie 4x4 (sekundy)
+    const TIME_LVL2 = 12; // Czas na powtórzenie sekwencji (sekundy)
+
+    /* ========================================================= */
+    /* LOGIKA POZIOMU 1: SLIDER 4x4 (1-15)                        */
+    /* ========================================================= */
+    let board = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0];
+
+    function initLevel1() {
+      currentLevel = 1;
+      document.getElementById('stageBadge').innerText = "ETAP 1 / 2";
+      document.getElementById('level1View').classList.remove('hidden');
+      document.getElementById('level2View').classList.add('hidden');
+      document.getElementById('resultOverlay').classList.add('hidden');
+
+      shuffleBoard();
+      renderBoard();
+      startTimer(TIME_LVL1, onTimeOut1);
+    }
+
+    function shuffleBoard() {
+      board = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0];
+      for (let i = 0; i < 100; i++) {
+        let emptyIdx = board.indexOf(0);
+        let validMoves = getValidMoves(emptyIdx);
+        let randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+        board[emptyIdx] = board[randomMove];
+        board[randomMove] = 0;
+      }
+    }
+
+    function getValidMoves(emptyIdx) {
+      let moves = [];
+      let row = Math.floor(emptyIdx / 4);
+      let col = emptyIdx % 4;
+
+      if (row > 0) moves.push(emptyIdx - 4);
+      if (row < 3) moves.push(emptyIdx + 4);
+      if (col > 0) moves.push(emptyIdx - 1);
+      if (col < 3) moves.push(emptyIdx + 1);
+
+      return moves;
+    }
+
+    function renderBoard() {
+      const grid = document.getElementById('boardGrid');
+      grid.innerHTML = '';
+      board.forEach((val, idx) => {
+        const tile = document.createElement('div');
+        tile.className = 'tile' + (val === 0 ? ' empty' : '');
+        tile.innerText = val !== 0 ? val : '';
+        tile.addEventListener('click', () => moveTile(idx));
+        grid.appendChild(tile);
+      });
+    }
+
+    function moveTile(idx) {
+      let emptyIdx = board.indexOf(0);
+      let validMoves = getValidMoves(emptyIdx);
+
+      if (validMoves.includes(idx)) {
+        board[emptyIdx] = board[idx];
+        board[idx] = 0;
+        renderBoard();
+
+        if (checkWin1()) {
+          clearInterval(timerInterval);
+          setTimeout(initLevel2, 300);
+        }
+      }
+    }
+
+    function checkWin1() {
+      const winPattern = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0];
+      return board.every((val, i) => val === winPattern[i]);
+    }
+
+    function onTimeOut1() {
+      showResult(false, "CZAS PRZEKROCZONY (ETAP 1)");
+    }
+
+    /* ========================================================= */
+    /* LOGIKA POZIOMU 2: SEKWENCJA CYFR                           */
+    /* ========================================================= */
+    let sequence = [];
+    let userSeq = [];
+    let isAllowedInput = false;
+
+    function initLevel2() {
+      currentLevel = 2;
+      document.getElementById('stageBadge').innerText = "ETAP 2 / 2";
+      document.getElementById('level1View').classList.add('hidden');
+      document.getElementById('level2View').classList.remove('hidden');
+
+      renderKeypad();
+      generateSequence();
+      playSequence();
+    }
+
+    function renderKeypad() {
+      const keypad = document.getElementById('keypad');
+      keypad.innerHTML = '';
+      for (let i = 1; i <= 9; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'num-btn';
+        btn.innerText = i;
+        btn.addEventListener('click', () => handleKeyClick(i));
+        keypad.appendChild(btn);
+      }
+    }
+
+    function generateSequence() {
+      sequence = [];
+      userSeq = [];
+      for (let i = 0; i < 5; i++) {
+        sequence.push(Math.floor(Math.random() * 9) + 1);
+      }
+    }
+
+    function playSequence() {
+      isAllowedInput = false;
+      document.getElementById('padStatus').innerText = "ZAPAMIĘTAJ KOLEJNOŚĆ...";
+      document.getElementById('numDisplay').innerText = "";
+      document.getElementById('timerBar').style.width = '100%';
+
+      let step = 0;
+      let interval = setInterval(() => {
+        if (step < sequence.length) {
+          document.getElementById('numDisplay').innerText = sequence[step];
+          step++;
+        } else {
+          clearInterval(interval);
+          setTimeout(() => {
+            document.getElementById('numDisplay').innerText = "_ _ _ _ _";
+            document.getElementById('padStatus').innerText = "WPISZ CYFRY W KOLEJNOŚCI";
+            isAllowedInput = true;
+            startTimer(TIME_LVL2, onTimeOut2);
+          }, 500);
+        }
+      }, 650);
+    }
+
+    function handleKeyClick(num) {
+      if (!isAllowedInput) return;
+
+      userSeq.push(num);
+      let currentIdx = userSeq.length - 1;
+
+      let displayStr = userSeq.join(' ') + ' _'.repeat(sequence.length - userSeq.length);
+      document.getElementById('numDisplay').innerText = displayStr;
+
+      if (userSeq[currentIdx] !== sequence[currentIdx]) {
+        showResult(false, "BŁĘDNA SEKWENCJA CYFR!");
+        return;
+      }
+
+      if (userSeq.length === sequence.length) {
+        clearInterval(timerInterval);
+        showResult(true, "SKLEP ZAHAKOWANY SUKCESEM!");
+      }
+    }
+
+    function onTimeOut2() {
+      showResult(false, "CZAS PRZEKROCZONY (ETAP 2)");
+    }
+
+    /* ========================================================= */
+    /* LOGIKA STERY ZEGARA I NAKŁADEK                            */
+    /* ========================================================= */
+    function startTimer(seconds, onOut) {
+      clearInterval(timerInterval);
+      timeLeft = seconds;
+      
+      timerInterval = setInterval(() => {
+        timeLeft -= 0.1;
+        let pct = Math.max(0, (timeLeft / seconds) * 100);
+        document.getElementById('timerBar').style.width = `${pct}%`;
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          onOut();
+        }
+      }, 100);
+    }
+
+    function showResult(win, msg) {
+      clearInterval(timerInterval);
+      const overlay = document.getElementById('resultOverlay');
+      const title = document.getElementById('resTitle');
+      overlay.classList.remove('hidden');
+
+      title.innerText = win ? "SUCCESS" : "SYSTEM FAILED";
+      title.style.color = win ? "var(--green-hack)" : "var(--red-fail)";
+      title.style.textShadow = win ? "0 0 15px var(--green-glow)" : "0 0 15px rgba(255, 42, 85, 0.4)";
+      document.getElementById('resSub').innerText = msg;
+    }
+
+    // Start gry przy wejściu
+    initLevel1();
+  </script>
+</body>
+</html>
