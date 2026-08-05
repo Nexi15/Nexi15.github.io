@@ -3,113 +3,201 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HACK // SKLEP</title>
+  <title>HACK // SYSTEM SKLEPOWY</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0d14;
-      --card-bg: #111420;
-      --accent: #ff0055;
-      --accent-glow: rgba(255, 0, 85, 0.4);
-      --success: #00ff66;
-      --success-glow: rgba(0, 255, 102, 0.3);
-      --key-bg: #1a1e2e;
-      --text: #ffffff;
-      --text-dim: #64748b;
+      --bg-dark: #090c10;
+      --card-bg: rgba(13, 19, 29, 0.94);
+      --border-cyan: #00f0ff;
+      --glow-cyan: rgba(0, 240, 255, 0.35);
+      --accent-pink: #ff0055;
+      --glow-pink: rgba(255, 0, 85, 0.4);
+      --success-green: #00ff66;
+      --glow-green: rgba(0, 255, 102, 0.4);
+      --key-bg: #141a26;
+      --text-main: #f0f4f8;
+      --text-dim: #60738a;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Rajdhani', sans-serif;
       user-select: none;
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 30%, rgba(0, 240, 255, 0.08) 0%, transparent 70%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 24px 24px, 24px 24px;
+      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 20px;
+    }
+
+    /* GŁÓWNA KARTA SYSTEMU */
+    .hack-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-cyan);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 450px;
+      padding: 24px;
+      box-shadow: 0 0 35px var(--glow-cyan), inset 0 0 15px rgba(0, 240, 255, 0.05);
+      backdrop-filter: blur(12px);
       position: relative;
     }
 
-    /* Karta hacka */
-    .hack-card {
-      background: var(--card-bg);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      width: 420px;
-      padding: 28px 24px 20px 24px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    .header-bar {
       display: flex;
-      flex-direction: column;
-      gap: 18px;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+      font-family: 'Share Tech Mono', monospace;
     }
 
-    .header {
+    .system-title {
+      font-size: 1.15rem;
+      color: var(--border-cyan);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .stage-badge {
+      font-size: 0.8rem;
+      color: var(--success-green);
+      background: rgba(0, 255, 102, 0.1);
+      padding: 4px 12px;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 255, 102, 0.3);
+      letter-spacing: 1px;
+    }
+
+    /* GLOBALNY PASEK CZASU */
+    .global-timer {
+      width: 100%;
+      height: 6px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .global-timer-bar {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--border-cyan), var(--success-green));
+      box-shadow: 0 0 10px var(--border-cyan);
+      transition: width 0.1s linear;
+    }
+
+    /* ================= POZIOM 1: PUZZLE 4x4 ================= */
+    .puzzle-instructions {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 15px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .slider-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      width: 320px;
+      height: 320px;
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 240, 255, 0.2);
+    }
+
+    .tile {
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid var(--border-cyan);
+      border-radius: 6px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      color: var(--accent);
-      font-weight: 700;
-      font-size: 1.1rem;
+      justify-content: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--border-cyan);
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
 
-    .subtitle {
-      color: #94a3b8;
-      font-size: 0.85rem;
-      margin-top: -10px;
+    .tile:hover {
+      background: rgba(0, 240, 255, 0.25);
+      box-shadow: 0 0 12px var(--glow-cyan);
     }
 
-    /* Wprowadzony kod na górze */
+    .tile.empty {
+      background: transparent;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      cursor: default;
+    }
+
+    /* ================= POZIOM 2: TIMING KEYPAD ================= */
     .code-display {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 16px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 14px;
       display: flex;
       justify-content: center;
       gap: 12px;
+      margin-bottom: 18px;
     }
 
     .code-slot {
-      width: 48px;
-      height: 54px;
-      border-radius: 8px;
-      border: 2px solid rgba(255, 255, 255, 0.1);
+      width: 46px;
+      height: 52px;
+      border-radius: 6px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
+      font-family: 'Share Tech Mono', monospace;
       font-size: 1.5rem;
-      font-weight: 800;
+      font-weight: bold;
       color: var(--text-dim);
-      transition: all 0.3s ease;
-      position: relative;
+      transition: all 0.25s ease;
     }
 
     .code-slot.active {
-      border-color: var(--accent);
-      color: var(--accent);
-      box-shadow: 0 0 12px var(--accent-glow);
+      border-color: var(--accent-pink);
+      color: var(--accent-pink);
+      box-shadow: 0 0 12px var(--glow-pink);
     }
 
     .code-slot.done {
-      border-color: var(--success);
-      color: var(--success);
-      box-shadow: 0 0 12px var(--success-glow);
+      border-color: var(--success-green);
+      color: var(--success-green);
+      box-shadow: 0 0 12px var(--glow-green);
     }
 
     .code-slot.dot::after {
       content: '•';
     }
 
-    /* Klawiatura cyfrowa */
     .keypad {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 14px 12px;
+      gap: 12px;
     }
 
     .key-wrapper {
@@ -121,32 +209,33 @@
 
     .key {
       width: 100%;
-      height: 60px;
+      height: 54px;
       background: var(--key-bg);
-      border: 2px solid rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-family: 'Share Tech Mono', monospace;
       font-size: 1.4rem;
-      font-weight: 800;
-      color: #64748b;
+      font-weight: bold;
+      color: var(--text-dim);
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .key.target {
-      border-color: var(--accent);
-      color: var(--accent);
-      box-shadow: 0 0 15px var(--accent-glow);
-      background: rgba(255, 0, 85, 0.05);
+      border-color: var(--accent-pink);
+      color: var(--accent-pink);
+      box-shadow: 0 0 15px var(--glow-pink);
+      background: rgba(255, 0, 85, 0.08);
     }
 
-    /* Pasek timera / strefy pod przyciskiem (widoczny zawsze dla aktywnego) */
     .timing-bar-container {
-      width: 60%;
+      width: 75%;
       height: 6px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 3px;
       position: relative;
       overflow: hidden;
@@ -161,8 +250,8 @@
       position: absolute;
       top: 0;
       height: 100%;
-      background: var(--success);
-      box-shadow: 0 0 6px var(--success);
+      background: var(--success-green);
+      box-shadow: 0 0 8px var(--success-green);
       z-index: 1;
     }
 
@@ -172,325 +261,74 @@
       left: 0;
       height: 100%;
       width: 0%;
-      background: var(--accent);
+      background: var(--accent-pink);
       z-index: 2;
     }
 
-    /* Statystyki pod spodem */
+    /* STATYSTYKI HACKA */
     .stats {
       display: flex;
       justify-content: space-around;
       text-align: center;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 14px;
+      margin-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .stat-box {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 2px;
     }
 
     .stat-label {
       font-size: 0.75rem;
       color: var(--text-dim);
-      font-weight: 600;
+      font-family: 'Share Tech Mono', monospace;
       text-transform: uppercase;
     }
 
     .stat-val {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: var(--accent);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: var(--border-cyan);
     }
 
-    .instruction {
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      line-height: 1.4;
+    /* KONTROLA & NAKŁADKA REZULTATU */
+    .action-bar {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
     }
 
-    /* Pasek globalnego czasu (30 Sekund) */
-    .global-timer {
-      width: 100%;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 2px;
-      overflow: hidden;
-      margin-top: 5px;
+    .btn-reset {
+      font-family: 'Share Tech Mono', monospace;
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid var(--border-cyan);
+      color: var(--border-cyan);
+      padding: 10px 24px;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s ease;
     }
 
-    .global-timer-bar {
-      width: 100%;
-      height: 100%;
-      background: var(--accent);
-      transition: width 0.1s linear;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="hack-card">
-    <div class="header">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v-2h3v2zm4 0h-2v-2h2v2z"/></svg>
-      <span>Klawiatura</span>
-    </div>
-    <div class="subtitle">Przytrzymaj cyfry i puść w zielonej strefie.</div>
-
-    <!-- Puste sloty na kod -->
-    <div class="code-display" id="codeDisplay"></div>
-
-    <!-- Klawiatura 1-9 -->
-    <div class="keypad" id="keypad"></div>
-
-    <!-- Statystyki -->
-    <div class="stats">
-      <div class="stat-box">
-        <span class="stat-label">Runda</span>
-        <span class="stat-val" id="roundVal">1/4</span>
-      </div>
-      <div class="stat-box">
-        <span class="stat-label">Postęp</span>
-        <span class="stat-val" id="progressVal">0/4</span>
-      </div>
-      <div class="stat-box">
-        <span class="stat-label">Próby</span>
-        <span class="stat-val" id="attemptsVal">0/3</span>
-      </div>
-    </div>
-
-    <div class="instruction">
-      Przytrzymaj podświetloną cyfrę<br>Puść w zielonej strefie
-    </div>
-
-    <div class="global-timer">
-      <div class="global-timer-bar" id="globalBar"></div>
-    </div>
-  </div>
-
-  <script>
-    const CONFIG = {
-      totalRounds: 4,
-      codeLength: 4,
-      maxFailures: 3,
-      totalTime: 30000 // 30 sekund na cały hack
-    };
-
-    let state = {
-      round: 1,
-      failures: 0,
-      code: [],
-      currentIndex: 0,
-      holding: false,
-      holdProgress: 0,
-      holdInterval: null,
-      targetZone: { min: 45, max: 65 }, // Zaznaczona zielona strefa %
-      timeLeft: CONFIG.totalTime,
-      timerInterval: null
-    };
-
-    const codeDisplay = document.getElementById('codeDisplay');
-    const keypad = document.getElementById('keypad');
-    const roundVal = document.getElementById('roundVal');
-    const progressVal = document.getElementById('progressVal');
-    const attemptsVal = document.getElementById('attemptsVal');
-    const globalBar = document.getElementById('globalBar');
-
-    function initGame() {
-      state.round = 1;
-      state.failures = 0;
-      state.timeLeft = CONFIG.totalTime;
-      startRound();
-      startGlobalTimer();
+    .btn-reset:hover {
+      background: var(--border-cyan);
+      color: #000;
+      box-shadow: 0 0 15px var(--glow-cyan);
     }
 
-    function startRound() {
-      state.code = Array.from({ length: CONFIG.codeLength }, () => Math.floor(Math.random() * 9) + 1);
-      state.currentIndex = 0;
-      
-      // Wygeneruj nową zieloną strefę
-      generateNewZone();
-      updateUI();
-      renderKeypad();
-    }
-
-    function generateNewZone() {
-      const min = Math.floor(Math.random() * 30) + 35; // strefa między 35% a 65%
-      state.targetZone = { min: min, max: min + 20 };  // szerokość strefy 20%
-    }
-
-    function renderKeypad() {
-      keypad.innerHTML = '';
-      codeDisplay.innerHTML = '';
-
-      // Wyświetlanie kodów na górze
-      state.code.forEach((num, idx) => {
-        const slot = document.createElement('div');
-        slot.className = 'code-slot';
-        if (idx < state.currentIndex) {
-          slot.classList.add('done');
-          slot.textContent = num;
-        } else if (idx === state.currentIndex) {
-          slot.classList.add('active');
-          slot.classList.add('dot');
-        } else {
-          slot.classList.add('dot');
-        }
-        codeDisplay.appendChild(slot);
-      });
-
-      // Wyświetlanie przycisków 1-9
-      for (let i = 1; i <= 9; i++) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'key-wrapper';
-
-        const btn = document.createElement('div');
-        btn.className = 'key';
-        btn.textContent = i;
-        btn.id = `key-${i}`;
-
-        const isTargetKey = (i === state.code[state.currentIndex]);
-
-        if (isTargetKey) {
-          btn.classList.add('target');
-        }
-
-        // Pasek przytrzymania pod klawiszem
-        const timingBar = document.createElement('div');
-        timingBar.className = 'timing-bar-container';
-        if (isTargetKey) {
-          timingBar.classList.add('visible'); // Widać pasek od razu pod aktywną cyfrą
-        }
-
-        // Zielona strefa wewnątrz
-        const zone = document.createElement('div');
-        zone.className = 'timing-zone';
-        zone.style.left = `${state.targetZone.min}%`;
-        zone.style.width = `${state.targetZone.max - state.targetZone.min}%`;
-
-        const progress = document.createElement('div');
-        progress.className = 'timing-progress';
-        progress.id = `progress-${i}`;
-
-        timingBar.appendChild(zone);
-        timingBar.appendChild(progress);
-
-        wrapper.appendChild(btn);
-        wrapper.appendChild(timingBar);
-        keypad.appendChild(wrapper);
-
-        // Eventy myszy / dotyku
-        btn.addEventListener('mousedown', () => startHold(i));
-        btn.addEventListener('mouseup', () => stopHold(i));
-        btn.addEventListener('mouseleave', () => { if (state.holding) stopHold(i); });
-
-        btn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(i); });
-        btn.addEventListener('touchend', (e) => { e.preventDefault(); stopHold(i); });
-      }
-    }
-
-    function startHold(num) {
-      if (num !== state.code[state.currentIndex] || state.holding) return;
-
-      state.holding = true;
-      state.holdProgress = 0;
-      
-      const progress = document.getElementById(`progress-${num}`);
-
-      state.holdInterval = setInterval(() => {
-        state.holdProgress += 2; // Prędkość napełniania
-        if (progress) progress.style.width = `${state.holdProgress}%`;
-
-        // Przekroczenie 100% = błąd
-        if (state.holdProgress >= 100) {
-          stopHold(num);
-        }
-      }, 15);
-    }
-
-    function stopHold(num) {
-      if (!state.holding || num !== state.code[state.currentIndex]) return;
-
-      clearInterval(state.holdInterval);
-      state.holding = false;
-
-      // Sprawdzenie czy trafiliśmy w zieloną strefę
-      if (state.holdProgress >= state.targetZone.min && state.holdProgress <= state.targetZone.max) {
-        // Trafione!
-        state.currentIndex++;
-        if (state.currentIndex >= CONFIG.codeLength) {
-          // Sukces rundy
-          if (state.round >= CONFIG.totalRounds) {
-            clearInterval(state.timerInterval);
-            alert("HACK UDANY! Włam zakończony sukcesem.");
-            initGame();
-          } else {
-            state.round++;
-            startRound();
-          }
-        } else {
-          generateNewZone();
-          renderKeypad();
-          updateUI();
-        }
-      } else {
-        // Błąd - nie trafiono w zieloną strefę
-        failAttempt();
-      }
-    }
-
-    function failAttempt() {
-      state.failures++;
-      updateUI();
-
-      if (state.failures >= CONFIG.maxFailures) {
-        clearInterval(state.timerInterval);
-        alert("HACK NIEUDANY! Przekroczono limit błędów.");
-        initGame();
-      } else {
-        // Zrestartuj cyfry w bieżącej rundzie
-        startRound();
-      }
-    }
-
-    function startGlobalTimer() {
-      clearInterval(state.timerInterval);
-      state.timerInterval = setInterval(() => {
-        state.timeLeft -= 100;
-        const pct = (state.timeLeft / CONFIG.totalTime) * 100;
-        globalBar.style.width = `${Math.max(0, pct)}%`;
-
-        if (state.timeLeft <= 0) {
-          clearInterval(state.timerInterval);
-          alert("HACK NIEUDANY! Czas minął.");
-          initGame();
-        }
-      }, 100);
-    }
-
-    function updateUI() {
-      roundVal.textContent = `${state.round}/${CONFIG.totalRounds}`;
-      progressVal.textContent = `${state.currentIndex}/${CONFIG.codeLength}`;
-      attemptsVal.textContent = `${state.failures}/${CONFIG.maxFailures}`;
-    }
-
-    // Obsługa fizycznej klawiatury (1-9)
-    window.addEventListener('keydown', (e) => {
-      const keyNum = parseInt(e.key);
-      if (keyNum >= 1 && keyNum <= 9) {
-        startHold(keyNum);
-      }
-    });
-
-    window.addEventListener('keyup', (e) => {
-      const keyNum = parseInt(e.key);
-      if (keyNum >= 1 && keyNum <= 9) {
-        stopHold(keyNum);
-      }
-    });
-
-    initGame();
-  </script>
-</body>
-</html>
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 12, 16, 0.96);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 20;
+      border
