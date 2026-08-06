@@ -332,7 +332,6 @@
     let currentStage = 1;
     let audioCtx = null;
 
-    // Odblokowanie AudioContext
     function initAudio() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -575,4 +574,88 @@
         // Lewa ściana
         ctx.fillRect(0, obs.y, obs.gapX, 8);
         // Prawa ściana
-        ctx.fillRect(obs.gapX + obs.gapW, obs.y, 320 - (obs.gapX + obs.
+        ctx.fillRect(obs.gapX + obs.gapW, obs.y, 320 - (obs.gapX + obs.gapW), 8);
+
+        // Sprawdzanie kolizji
+        if (obs.y >= 312 && obs.y <= 340) {
+          if (playerX < obs.gapX || playerX + 20 > obs.gapX + obs.gapW) {
+            playToneSound(120, 0.4);
+            showResult(false, "ZDERZENIE Z PRZESZKODĄ!");
+            return;
+          }
+        }
+      }
+
+      obstacles = obstacles.filter(o => o.y < 370);
+
+      if (currentHeight >= 1000) {
+        playToneSound(600, 0.5);
+        showResult(true, "JACHT ZAHAKOWANY POMYŚLNIE!");
+        return;
+      }
+
+      metaAnimId = requestAnimationFrame(loopLevel4);
+    }
+
+    /* OBSŁUGA KLAWIATURY */
+    window.addEventListener('keydown', (e) => {
+      initAudio();
+      keysPressed[e.key] = true;
+
+      if (currentStage === 1) {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          playTargetTone();
+        } else if (e.code === 'Enter') {
+          e.preventDefault();
+          submitLevel1();
+        }
+      } else if (currentStage === 3) {
+        if (['w','W','s','S','a','A','d','D'].includes(e.key)) {
+          e.preventDefault();
+          if (e.key === 'w' || e.key === 'W') movePlayer(-1, 0);
+          if (e.key === 's' || e.key === 'S') movePlayer(1, 0);
+          if (e.key === 'a' || e.key === 'A') movePlayer(0, -1);
+          if (e.key === 'd' || e.key === 'D') movePlayer(0, 1);
+        }
+      } else if (currentStage === 4) {
+        if (['a','A','d','D'].includes(e.key)) {
+          e.preventDefault();
+        }
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      keysPressed[e.key] = false;
+    });
+
+    /* FUNKCJE POMOCNICZE */
+    function updateHeader(title, stage) {
+      document.getElementById('titleText').innerText = title;
+      document.getElementById('stageBadge').innerText = stage;
+    }
+
+    function showView(viewId) {
+      ['level1View', 'level2View', 'level3View', 'level4View'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    function showResult(win, msg) {
+      currentStage = 0;
+      if (metaAnimId) cancelAnimationFrame(metaAnimId);
+      const overlay = document.getElementById('resultOverlay');
+      const title = document.getElementById('resTitle');
+      overlay.classList.remove('hidden');
+
+      title.innerText = win ? "SUKCES" : "PORAŻKA";
+      title.style.color = win ? "var(--green)" : "var(--border-pink)";
+      document.getElementById('resSub').innerText = msg;
+    }
+
+    // Inicjalizacja gry
+    initYachtHack();
+  </script>
+</body>
+</html>
